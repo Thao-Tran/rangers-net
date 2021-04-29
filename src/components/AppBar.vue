@@ -8,7 +8,7 @@
     <div class="d-flex align-center">
       <v-img
         :src="require('../assets/logo.svg')"
-        alt="Vuetify Logo"
+        alt="RangersNet Logo"
         class="shrink mr-2"
         contain
         transition="scale-transition"
@@ -17,50 +17,33 @@
       <v-app-bar-title>RangersNet</v-app-bar-title>
     </div>
 
-    <v-tabs slider-color="secondary" slider-size="4" right>
-      <v-tab>
-        <v-menu offset-y open-on-hover>
+    <v-tabs slider-color="secondary" slider-size="4" right v-model="activeTab">
+      <v-tab v-for="(item, index) in items" :key="index" v-bind:class="item.class">
+        <v-menu v-if="item.items !== undefined" offset-y open-on-hover>
           <template v-slot:activator="{ on, attrs }">
-            <span plain v-bind="attrs" v-on="on" class="management-menu">
-              Management
+            <span plain v-bind="attrs" v-on="on" class="menu">
+              {{ item.title }}
               <v-icon>mdi-chevron-down</v-icon>
             </span>
           </template>
-          <v-list-item-group class="management-menu-item-group">
-            <v-list-item>
+          <v-list-item-group class="menu-item-group">
+            <v-list-item v-for="menuItem in item.items" :key="menuItem.title" v-on:click="activeTab = index">
               <v-list-item-content>
                 <v-list-item-title>
-                  General
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>
-                  Profile
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>
-                  Profile
+                  {{ menuItem.title }}
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
         </v-menu>
+        <span v-else>{{ item.title }}</span>
       </v-tab>
-      <v-tab>Reporting</v-tab>
-      <v-tab>Users</v-tab>
-      <v-tab>Operations</v-tab>
-      <v-tab>System</v-tab>
     </v-tabs>
   </v-app-bar>
 </template>
 
 <style lang="scss" scoped>
-.management-menu {
+.menu {
   display: flex;
   height: 100%;
   align-items: center;
@@ -73,7 +56,51 @@
 
 <script lang="ts">
 import Vue from 'vue'
-export default Vue.extend({
-  name: 'AppBar'
-})
+import Component from 'vue-class-component'
+
+export interface AppBarItem {
+  title: string
+  items?: AppBarItem[]
+  class?: string
+}
+
+@Component
+export default class AppBar extends Vue {
+  name = 'AppBar'
+
+  data (): {items: AppBarItem[], activeTab: number} {
+    return {
+      items: [
+        {
+          title: 'Management',
+          items: [
+            {
+              title: 'General'
+            },
+            {
+              title: 'Profile'
+            },
+            {
+              title: 'Roster'
+            }
+          ],
+          class: 'management'
+        },
+        {
+          title: 'Reporting'
+        },
+        {
+          title: 'Users'
+        },
+        {
+          title: 'Operations'
+        },
+        {
+          title: 'System'
+        }
+      ],
+      activeTab: 0
+    }
+  }
+}
 </script>
