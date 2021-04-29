@@ -26,7 +26,7 @@
               <v-icon>mdi-chevron-down</v-icon>
             </span>
           </template>
-          <v-list-item-group class="menu-item-group">
+          <v-list-item-group class="menu-item-group" v-model="activeMenuItem[index]">
             <v-list-item v-for="menuItem in item.items" :key="menuItem.title" v-on:click="activeTab = index">
               <v-list-item-content>
                 <v-list-item-title>
@@ -67,39 +67,41 @@ export interface AppBarItem {
 @Component
 export default class AppBar extends Vue {
   name = 'AppBar'
-
-  data (): {items: AppBarItem[], activeTab: number} {
-    return {
+  activeTab = 0
+  selectedMenuItems = {}
+  items = [
+    {
+      title: 'Management',
       items: [
         {
-          title: 'Management',
-          items: [
-            {
-              title: 'General'
-            },
-            {
-              title: 'Profile'
-            },
-            {
-              title: 'Roster'
-            }
-          ],
-          class: 'management'
+          title: 'General'
         },
         {
-          title: 'Reporting'
+          title: 'Profile'
         },
         {
-          title: 'Users'
-        },
-        {
-          title: 'Operations'
-        },
-        {
-          title: 'System'
+          title: 'Roster'
         }
       ],
-      activeTab: 0
+      class: 'management'
+    },
+    {
+      title: 'Reporting'
+    },
+    {
+      title: 'Users'
+    },
+    {
+      title: 'Operations'
+    },
+    {
+      title: 'System'
+    }
+  ]
+
+  get activeMenuItem (): Record<number, number> {
+    return {
+      [this.activeTab]: this.selectedMenuItems[this.activeTab]
     }
   }
 }
