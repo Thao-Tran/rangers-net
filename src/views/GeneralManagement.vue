@@ -79,7 +79,7 @@ export default class GeneralManagement extends Vue {
       title: 'Evaluations',
       items: [
         {
-          label: 'Plavers'
+          label: 'Players'
         },
         {
           label: 'Coaches'
