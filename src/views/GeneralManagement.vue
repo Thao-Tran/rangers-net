@@ -60,6 +60,10 @@ export default class GeneralManagement extends GeneralManagementComponents {
         {
           label: 'Team budget',
           route: `${ROUTE_PATH}/budget`
+        },
+        {
+          label: 'Awards voting',
+          route: `${ROUTE_PATH}/awards`
         }
       ]
     },
@@ -89,6 +93,27 @@ export default class GeneralManagement extends GeneralManagementComponents {
         {
           label: 'Approved permits',
           route: `${ROUTE_PATH}/approved-permits`
+        }
+      ]
+    },
+    {
+      title: 'Evaluations',
+      items: [
+        {
+          label: 'Plavers',
+          route: `${ROUTE_PATH}/player-evaluations`
+        },
+        {
+          label: 'Coaches',
+          route: `${ROUTE_PATH}/coach-evaluations`
+        },
+        {
+          label: 'Completed',
+          route: `${ROUTE_PATH}/completed-evaluations`
+        },
+        {
+          label: 'Missing',
+          route: `${ROUTE_PATH}/missing-evaluations`
         }
       ]
     }

@@ -2,17 +2,26 @@
   <v-navigation-drawer permanent>
     <selection-box v-if="isSelectionBoxVisible" v-bind:fields="selectionBoxFields"/>
     <v-divider v-if="isSelectionBoxVisible"/>
-    <div class="nav-items">
+    <v-list class="nav-items">
       <div class="nav-title grey--text text--darken-4">{{ title }}</div>
       <div v-for="(section, index) in sections" :key="index">
-        <div v-if="section.title !== undefined" class="section-title grey--text text--darken-4">{{ section.title }}</div>
-        <v-list>
+        <v-list-group v-if="section.title !== undefined">
+          <template v-slot:activator>
+            <v-list-item-content>
+              <v-list-item-title v-text="section.title"/>
+            </v-list-item-content>
+          </template>
           <v-list-item v-bind:to="sectionItem.route" v-for="(sectionItem, itemIndex) in section.items" :key="itemIndex">
-            <v-list-item-title class="section-item grey--text text--darken-2" v-bind:title="sectionItem.label">{{ sectionItem.label }}</v-list-item-title>
+            <v-list-item-title class="section-item" v-bind:title="sectionItem.label" v-text="sectionItem.label"/>
+          </v-list-item>
+        </v-list-group>
+        <v-list v-else>
+          <v-list-item v-bind:to="sectionItem.route" v-for="(sectionItem, itemIndex) in section.items" :key="itemIndex">
+            <v-list-item-title class="section-item" v-bind:title="sectionItem.label" v-text="sectionItem.label"/>
           </v-list-item>
         </v-list>
       </div>
-    </div>
+    </v-list>
   </v-navigation-drawer>
 </template>
 
@@ -76,14 +85,20 @@ export default class NavigationDrawer extends NavigationDrawerProps {
       line-height: 24px;
     }
 
-    .section-title {
-      margin: 16px;
-      font-size: 16px;
-      line-height: 24px;
-    }
-
     .section-item {
       padding: 0 24px;
+    }
+
+    .v-list-group {
+      .v-list-group__header {
+        .v-list-group__header__append-icon {
+          min-width: 0;
+        }
+      }
+    }
+
+    .v-list-item__title {
+      font-size: 14px;
     }
   }
 }
