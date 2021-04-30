@@ -1,8 +1,13 @@
 <template>
   <v-navigation-drawer permanent>
-    <selection-box v-if="isSelectionBoxVisible" v-bind:fields="selectionBoxFields"/>
+    <selection-box
+      v-if="isSelectionBoxVisible"
+      :fields="selectionBoxFields"
+      :selectedValues="selectionBoxValues"
+      v-on:change="$emit('change', $event)"
+    />
     <v-divider v-if="isSelectionBoxVisible"/>
-    <v-list class="nav-items">
+    <v-list v-if="sections !== undefined" class="nav-items">
       <div class="nav-title grey--text text--darken-4">{{ title }}</div>
       <div v-for="(section, index) in sections" :key="index">
         <v-list-group v-if="section.title !== undefined">
@@ -41,14 +46,15 @@ export interface NavigationSection {
   items: NavigationSectionItem[]
 }
 
-@Component({ components: { SelectionBox } })
+@Component({ components: { SelectionBox }, model: { prop: 'selectionBoxValues', event: 'change' } })
 export default class NavigationDrawer extends Vue {
   name = 'NavigationDrawer'
 
   @Prop({ type: Boolean, default: true }) isSelectionBoxVisible!: boolean
   @Prop(Array) selectionBoxFields?: SelectionItem[]
+  @Prop(Object) selectionBoxValues?: Record<string, string>
   @Prop(String) title?: string
-  @Prop(Array) sections?: NavigationSection
+  @Prop(Array) sections?: NavigationSection[]
 }
 </script>
 

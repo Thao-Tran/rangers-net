@@ -1,12 +1,13 @@
 <template>
   <div>
-    <navigation-drawer title="General management" v-bind:sections="sections"/>
+    <navigation-drawer title="General management" :sections="sections" :selectionBoxFields="selectionBoxFields" v-model="selectedFilters"/>
     <router-view></router-view>
   </div>
 </template>
 
 <script lang="ts">
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
+import { defaultItems, defaultSelectionFields, SelectionItem } from '@/components/SelectionBox.vue'
 import Vue from 'vue'
 import Component from 'vue-class-component'
 
@@ -15,7 +16,7 @@ export const ROUTE_PATH = '/general-management'
 @Component({ components: { NavigationDrawer } })
 export default class GeneralManagement extends Vue {
   name = 'GeneralManagement'
-
+  selectedFilters: Record<string, string> = {}
   sections = [
     {
       items: [
@@ -93,6 +94,11 @@ export default class GeneralManagement extends Vue {
       ]
     }
   ]
+
+  get selectionBoxFields (): SelectionItem[] {
+    return defaultItems.division.slice(0, 4).includes(this.selectedFilters.division)
+      ? defaultSelectionFields.filter(({ id }) => id !== 'subdivision') : defaultSelectionFields
+  }
 }
 </script>
 
