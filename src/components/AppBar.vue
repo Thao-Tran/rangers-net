@@ -7,7 +7,7 @@
   >
     <div class="d-flex align-center">
       <v-img
-        :src="require('../assets/logo.svg')"
+        src="@/assets/logo.svg"
         alt="RangersNet Logo"
         class="shrink mr-2"
         contain
@@ -30,7 +30,7 @@
               <v-icon>mdi-chevron-down</v-icon>
             </span>
           </template>
-          <v-list-item-group class="menu-item-group" v-model="activeMenuItem[index]">
+          <v-list class="menu-item-group" v-model="activeMenuItem[index]">
             <v-list-item v-for="menuItem in item.items" :key="menuItem.title" v-on:click="activeTab = index" v-bind:to="menuItem.route">
               <v-list-item-content>
                 <v-list-item-title>
@@ -38,7 +38,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-          </v-list-item-group>
+          </v-list>
         </v-menu>
         <span v-else>{{ item.title }}</span>
       </v-tab>
@@ -79,7 +79,7 @@ export default class AppBar extends Vue {
   name = 'AppBar'
   activeTab = 0
   selectedMenuItems: Record<string, number> = {}
-  items = [
+  items: AppBarItem[] = [
     {
       title: 'Management',
       items: [
