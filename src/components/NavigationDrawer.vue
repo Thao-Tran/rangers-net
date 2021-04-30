@@ -26,9 +26,10 @@
 </template>
 
 <script lang="ts">
-import SelectionBox from '@/components/SelectionBox.vue'
+import SelectionBox, { SelectionItem } from '@/components/SelectionBox.vue'
 import Vue from 'vue'
 import Component from 'vue-class-component'
+import { Prop } from 'vue-property-decorator'
 
 export interface NavigationSectionItem {
   label: string
@@ -40,26 +41,14 @@ export interface NavigationSection {
   items: NavigationSectionItem[]
 }
 
-const NavigationDrawerProps = Vue.extend({
-  props: {
-    isSelectionBoxVisible: {
-      type: Boolean,
-      default (): boolean {
-        return true
-      }
-    },
-    selectionBoxFields: Array,
-    title: String,
-    sections: Array as () => NavigationSection[]
-  },
-  components: {
-    SelectionBox
-  }
-})
-
-@Component
-export default class NavigationDrawer extends NavigationDrawerProps {
+@Component({ components: { SelectionBox } })
+export default class NavigationDrawer extends Vue {
   name = 'NavigationDrawer'
+
+  @Prop({ type: Boolean, default: true }) isSelectionBoxVisible!: boolean
+  @Prop(Array) selectionBoxFields?: SelectionItem[]
+  @Prop(String) title?: string
+  @Prop(Array) sections?: NavigationSection
 }
 </script>
 

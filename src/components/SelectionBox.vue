@@ -11,6 +11,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
+import { Prop } from 'vue-property-decorator'
 
 export interface SelectionItem {
   label: string
@@ -36,20 +37,11 @@ export const defaultSelectionFields = [
   }
 ]
 
-const SelectionBoxProps = Vue.extend({
-  props: {
-    fields: {
-      type: Array as () => SelectionItem[],
-      default (): SelectionItem[] {
-        return defaultSelectionFields
-      }
-    }
-  }
-})
-
 @Component
-export default class SelectionBox extends SelectionBoxProps {
+export default class SelectionBox extends Vue {
   name = 'SelectionBox'
+
+  @Prop({ type: Array, default: () => defaultSelectionFields }) readonly fields!: SelectionItem[]
 }
 </script>
 

@@ -8,20 +8,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import AppBar from '@/components/AppBar.vue'
+import Vue from 'vue'
+import Component from 'vue-class-component'
 
-export default Vue.extend({
-  name: 'App',
-
-  components: {
-    AppBar
-  },
-
-  data: () => ({
-    //
-  })
-})
+@Component({ components: { AppBar } })
+export default class App extends Vue {
+  name = 'App'
+}
 </script>
 
 <style lang="scss">

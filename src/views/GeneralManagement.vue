@@ -12,14 +12,8 @@ import Component from 'vue-class-component'
 
 export const ROUTE_PATH = '/general-management'
 
-const GeneralManagementComponents = Vue.extend({
-  components: {
-    NavigationDrawer
-  }
-})
-
-@Component
-export default class GeneralManagement extends GeneralManagementComponents {
+@Component({ components: { NavigationDrawer } })
+export default class GeneralManagement extends Vue {
   name = 'GeneralManagement'
 
   sections = [
