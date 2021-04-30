@@ -2,7 +2,7 @@
   <v-app>
     <app-bar/>
     <v-main>
-      <router-view/>
+      <router-view class="app-router-view"/>
     </v-main>
   </v-app>
 </template>
@@ -23,3 +23,13 @@ export default Vue.extend({
   })
 })
 </script>
+
+<style lang="scss">
+.v-main {
+  height: 100vh;
+}
+
+.app-router-view {
+  height: 100%;
+}
+</style>

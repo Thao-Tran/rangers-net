@@ -68,7 +68,7 @@ export interface AppBarItem {
 export default class AppBar extends Vue {
   name = 'AppBar'
   activeTab = 0
-  selectedMenuItems = {}
+  selectedMenuItems: Record<string, number> = {}
   items = [
     {
       title: 'Management',
@@ -99,9 +99,9 @@ export default class AppBar extends Vue {
     }
   ]
 
-  get activeMenuItem (): Record<number, number> {
+  get activeMenuItem (): Record<string, number> {
     return {
-      [this.activeTab]: this.selectedMenuItems[this.activeTab]
+      [`${this.activeTab}`]: this.selectedMenuItems[`${this.activeTab}`]
     }
   }
 }
