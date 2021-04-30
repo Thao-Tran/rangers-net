@@ -14,11 +14,15 @@
         transition="scale-transition"
         width="36"
       />
-      <v-app-bar-title>RangersNet</v-app-bar-title>
+      <v-app-bar-title>
+        <router-link to="/" class="app-bar-title-link">
+          RangersNet
+        </router-link>
+      </v-app-bar-title>
     </div>
 
     <v-tabs slider-color="secondary" slider-size="4" right v-model="activeTab">
-      <v-tab v-for="(item, index) in items" :key="index" v-bind:class="item.class">
+      <v-tab v-for="(item, index) in items" :key="index" v-bind:class="item.class" v-bind:to="item.route">
         <v-menu v-if="item.items !== undefined" offset-y open-on-hover>
           <template v-slot:activator="{ on, attrs }">
             <span plain v-bind="attrs" v-on="on" class="menu">
@@ -27,7 +31,7 @@
             </span>
           </template>
           <v-list-item-group class="menu-item-group" v-model="activeMenuItem[index]">
-            <v-list-item v-for="menuItem in item.items" :key="menuItem.title" v-on:click="activeTab = index">
+            <v-list-item v-for="menuItem in item.items" :key="menuItem.title" v-on:click="activeTab = index" v-bind:to="menuItem.route">
               <v-list-item-content>
                 <v-list-item-title>
                   {{ menuItem.title }}
@@ -52,6 +56,11 @@
     background: white;
   }
 }
+
+.app-bar-title-link {
+  color: white;
+  text-decoration: none;
+}
 </style>
 
 <script lang="ts">
@@ -60,8 +69,9 @@ import Component from 'vue-class-component'
 
 export interface AppBarItem {
   title: string
-  items?: AppBarItem[]
   class?: string
+  route?: string
+  items?: AppBarItem[]
 }
 
 @Component
@@ -74,7 +84,8 @@ export default class AppBar extends Vue {
       title: 'Management',
       items: [
         {
-          title: 'General'
+          title: 'General',
+          route: '/general-management'
         },
         {
           title: 'Profile'
