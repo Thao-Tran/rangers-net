@@ -20,44 +20,35 @@ export default class GeneralManagement extends Vue {
     {
       items: [
         {
-          label: 'Team dashboard',
-          route: `${ROUTE_PATH}/team-dashboard`
+          label: 'Team dashboard'
         },
         {
-          label: 'Division dashboard',
-          route: `${ROUTE_PATH}/division-dashboard`
+          label: 'Division dashboard'
         },
         {
           label: 'Roster',
           route: `${ROUTE_PATH}/roster`
         },
         {
-          label: 'Managers & bench staff',
-          route: `${ROUTE_PATH}/bench-staff`
+          label: 'Managers & bench staff'
         },
         {
-          label: 'Communications',
-          route: `${ROUTE_PATH}/communications`
+          label: 'Communications'
         },
         {
-          label: 'Gamesheets',
-          route: `${ROUTE_PATH}/gamesheets`
+          label: 'Gamesheets'
         },
         {
-          label: 'Request substitute goalie',
-          route: `${ROUTE_PATH}/sub-goalie`
+          label: 'Request substitute goalie'
         },
         {
-          label: 'Draft management',
-          route: `${ROUTE_PATH}/draft`
+          label: 'Draft management'
         },
         {
-          label: 'Team budget',
-          route: `${ROUTE_PATH}/budget`
+          label: 'Team budget'
         },
         {
-          label: 'Awards voting',
-          route: `${ROUTE_PATH}/awards`
+          label: 'Awards voting'
         }
       ]
     },
@@ -65,28 +56,22 @@ export default class GeneralManagement extends Vue {
       title: 'Tournaments & exhibitions',
       items: [
         {
-          label: 'Tournament listing',
-          route: `${ROUTE_PATH}/tournaments`
+          label: 'Tournament listing'
         },
         {
-          label: 'Exhibition games',
-          route: `${ROUTE_PATH}/exhibitions`
+          label: 'Exhibition games'
         },
         {
-          label: 'Verify tournaments',
-          route: `${ROUTE_PATH}/verify-tournaments`
+          label: 'Verify tournaments'
         },
         {
-          label: 'Pending convenor approval',
-          route: `${ROUTE_PATH}/pending-covenor`
+          label: 'Pending convenor approval'
         },
         {
-          label: 'Pending office approval',
-          route: `${ROUTE_PATH}/pending-office`
+          label: 'Pending office approval'
         },
         {
-          label: 'Approved permits',
-          route: `${ROUTE_PATH}/approved-permits`
+          label: 'Approved permits'
         }
       ]
     },
@@ -94,20 +79,16 @@ export default class GeneralManagement extends Vue {
       title: 'Evaluations',
       items: [
         {
-          label: 'Plavers',
-          route: `${ROUTE_PATH}/player-evaluations`
+          label: 'Plavers'
         },
         {
-          label: 'Coaches',
-          route: `${ROUTE_PATH}/coach-evaluations`
+          label: 'Coaches'
         },
         {
-          label: 'Completed',
-          route: `${ROUTE_PATH}/completed-evaluations`
+          label: 'Completed'
         },
         {
-          label: 'Missing',
-          route: `${ROUTE_PATH}/missing-evaluations`
+          label: 'Missing'
         }
       ]
     }
