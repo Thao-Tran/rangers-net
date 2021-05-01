@@ -26,7 +26,7 @@
           single-select
           class="mt-2"
         >
-          <template v-slot:item.name="{ item }">
+          <template v-slot:[`item.name`]="{ item }">
             <router-link :to="{ query: { ...$route.query, player: item.id } }" v-text="item.name" class="text-uppercase text-decoration-none font-weight-medium"/>
           </template>
         </v-data-table>
