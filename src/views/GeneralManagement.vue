@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import NavigationDrawer from '@/components/NavigationDrawer.vue'
-import { defaultItems, defaultSelectionFields, SelectionItem } from '@/components/SelectionBox.vue'
+import { defaultItems, defaultSelectionFields, SelectionField } from '@/components/SelectionBox.vue'
 import Vue from 'vue'
 import Component from 'vue-class-component'
 
@@ -95,8 +95,8 @@ export default class GeneralManagement extends Vue {
     }
   ]
 
-  get selectionBoxFields (): SelectionItem[] {
-    return defaultItems.division.slice(0, 4).includes(this.selectedFilters.division)
+  get selectionBoxFields (): SelectionField[] {
+    return defaultItems.division.slice(0, 4).find(({ value }) => value === this.selectedFilters.division) !== undefined
       ? defaultSelectionFields.filter(({ id }) => id !== 'subdivision') : defaultSelectionFields
   }
 }

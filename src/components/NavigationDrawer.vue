@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import SelectionBox, { SelectionItem } from '@/components/SelectionBox.vue'
+import SelectionBox, { SelectionField } from '@/components/SelectionBox.vue'
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Prop } from 'vue-property-decorator'
@@ -51,7 +51,7 @@ export default class NavigationDrawer extends Vue {
   name = 'NavigationDrawer'
 
   @Prop({ type: Boolean, default: true }) isSelectionBoxVisible!: boolean
-  @Prop(Array) selectionBoxFields?: SelectionItem[]
+  @Prop(Array) selectionBoxFields?: SelectionField[]
   @Prop(Object) selectionBoxValues?: Record<string, string>
   @Prop(String) title?: string
   @Prop(Array) sections?: NavigationSection[]

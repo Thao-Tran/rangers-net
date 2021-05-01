@@ -23,10 +23,15 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Prop } from 'vue-property-decorator'
 
-export interface SelectionItem {
+export interface SelectionField {
   id: string
   label: string
   endpoint: string
+}
+
+export interface SelectionItem {
+  value: string
+  text: string
 }
 
 export const defaultSelectionFields = [
@@ -52,21 +57,74 @@ export const defaultSelectionFields = [
   }
 ]
 
-export const defaultItems: Record<string, string[]> = {
-  league: ['House', 'Rep'],
-  division: ['U5', 'U7', 'U8', 'U9', 'U10', 'U11', 'U12', 'U13', 'U14', 'U15', 'U16', 'U18', 'U21'],
-  subdivision: ['Red', 'White'],
-  team: Array(faker.datatype.number({ min: 5, max: 10 })).fill('').map(() => faker.name.lastName().toUpperCase())
+export const defaultItems: Record<string, SelectionItem[]> = {
+  league: [{ text: 'House', value: '1' }, { text: 'Rep', value: '2' }],
+  division: [
+    {
+      text: 'U5',
+      value: '1'
+    },
+    {
+      text: 'U7',
+      value: '2'
+    },
+    {
+      text: 'U8',
+      value: '3'
+    },
+    {
+      text: 'U9',
+      value: '4'
+    },
+    {
+      text: 'U10',
+      value: '5'
+    },
+    {
+      text: 'U11',
+      value: '6'
+    },
+    {
+      text: 'U12',
+      value: '7'
+    },
+    {
+      text: 'U13',
+      value: '8'
+    },
+    {
+      text: 'U14',
+      value: '9'
+    },
+    {
+      text: 'U15',
+      value: '10'
+    },
+    {
+      text: 'U16',
+      value: '11'
+    },
+    {
+      text: 'U18',
+      value: '12'
+    },
+    {
+      text: 'U21',
+      value: '13'
+    }
+  ],
+  subdivision: [{ text: 'Red', value: '1' }, { text: 'White', value: '2' }],
+  team: Array(faker.datatype.number({ min: 5, max: 10 })).fill('').map((_, i) => ({ value: `${i}`, text: faker.name.lastName().toUpperCase() }))
 }
 
 @Component({ model: { prop: 'selectedValues', event: 'change' } })
 export default class SelectionBox extends Vue {
   name = 'SelectionBox'
 
-  @Prop({ type: Array, default: () => defaultSelectionFields }) readonly fields!: SelectionItem[]
+  @Prop({ type: Array, default: () => defaultSelectionFields }) readonly fields!: SelectionField[]
   @Prop({ type: Object, default: () => ({}) }) selectedValues!: Record<string, string>
 
-  get items (): Record<string, string[]> {
+  get items (): Record<string, SelectionItem[]> {
     return {
       league: defaultItems.league,
       ...this.fields.slice(1).reduce((items, { id }, i) => {
