@@ -3,7 +3,6 @@
     <selection-box
       v-if="isSelectionBoxVisible"
       :fields="selectionBoxFields"
-      :selectedValues="selectionBoxValues"
       v-on:change="$emit('change', $event)"
     />
     <v-divider v-if="isSelectionBoxVisible"/>
@@ -16,12 +15,12 @@
               <v-list-item-title v-text="section.title"/>
             </v-list-item-content>
           </template>
-          <v-list-item v-bind:to="sectionItem.route" v-for="(sectionItem, itemIndex) in section.items" :key="itemIndex">
+          <v-list-item v-bind:to="sectionItem.route ? { path: sectionItem.route, query: $route.query }: undefined" v-for="(sectionItem, itemIndex) in section.items" :key="itemIndex">
             <v-list-item-title class="section-item" v-bind:title="sectionItem.label" v-text="sectionItem.label"/>
           </v-list-item>
         </v-list-group>
         <v-list v-else>
-          <v-list-item v-bind:to="sectionItem.route" v-for="(sectionItem, itemIndex) in section.items" :key="itemIndex">
+          <v-list-item :to="sectionItem.route ? { path: sectionItem.route, query: $route.query } : undefined" v-for="(sectionItem, itemIndex) in section.items" :key="itemIndex">
             <v-list-item-title class="section-item" v-bind:title="sectionItem.label" v-text="sectionItem.label"/>
           </v-list-item>
         </v-list>
@@ -46,13 +45,12 @@ export interface NavigationSection {
   items: NavigationSectionItem[]
 }
 
-@Component({ components: { SelectionBox }, model: { prop: 'selectionBoxValues', event: 'change' } })
+@Component({ components: { SelectionBox } })
 export default class NavigationDrawer extends Vue {
   name = 'NavigationDrawer'
 
   @Prop({ type: Boolean, default: true }) isSelectionBoxVisible!: boolean
   @Prop(Array) selectionBoxFields?: SelectionField[]
-  @Prop(Object) selectionBoxValues?: Record<string, string>
   @Prop(String) title?: string
   @Prop(Array) sections?: NavigationSection[]
 }

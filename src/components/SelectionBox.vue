@@ -5,7 +5,7 @@
         <v-select
           :items="items[field.id]"
           :label="field.label"
-          :value="selectedValues[field.id]"
+          :value="$route.query[field.id]"
           :disabled="items[field.id] === undefined"
           v-on:change="updateSelectedValues(field.id, $event)"
           outlined
@@ -117,18 +117,17 @@ export const defaultItems: Record<string, SelectionItem[]> = {
   team: Array(faker.datatype.number({ min: 5, max: 10 })).fill('').map((_, i) => ({ value: `${i}`, text: faker.name.lastName().toUpperCase() }))
 }
 
-@Component({ model: { prop: 'selectedValues', event: 'change' } })
+@Component
 export default class SelectionBox extends Vue {
   name = 'SelectionBox'
 
   @Prop({ type: Array, default: () => defaultSelectionFields }) readonly fields!: SelectionField[]
-  @Prop({ type: Object, default: () => ({}) }) selectedValues!: Record<string, string>
 
   get items (): Record<string, SelectionItem[]> {
     return {
       league: defaultItems.league,
       ...this.fields.slice(1).reduce((items, { id }, i) => {
-        const dependentValue = this.selectedValues?.[this.fields[i]?.id]
+        const dependentValue = this.$route.query[this.fields[i]?.id]
         if (dependentValue === undefined) {
           return items
         }
@@ -143,14 +142,15 @@ export default class SelectionBox extends Vue {
 
   updateSelectedValues (fieldId: string, value: string): void {
     // Clear selected values that are dependent on the updated value
-    const selectedValues = this.fields.slice(0, this.fields.findIndex((field) => field.id === fieldId)).reduce((selectedValues, { id }) => {
+    const prevSelectedValues = this.fields.slice(0, this.fields.findIndex((field) => field.id === fieldId)).reduce((selectedValues, { id }) => {
       return {
         ...selectedValues,
-        [id]: this.selectedValues[id]
+        [id]: this.$route.query[id]
       }
     }, {})
+    const selectedValue = { ...prevSelectedValues, [fieldId]: value }
 
-    this.$emit('change', { ...selectedValues, [fieldId]: value })
+    this.$router.push({ query: selectedValue })
   }
 }
 </script>

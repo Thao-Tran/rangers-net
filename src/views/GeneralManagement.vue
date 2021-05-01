@@ -1,6 +1,6 @@
 <template>
   <div>
-    <navigation-drawer title="General management" :sections="sections" :selectionBoxFields="selectionBoxFields" v-model="selectedFilters"/>
+    <navigation-drawer title="General management" :sections="sections" :selectionBoxFields="selectionBoxFields"/>
     <router-view></router-view>
   </div>
 </template>
@@ -96,7 +96,7 @@ export default class GeneralManagement extends Vue {
   ]
 
   get selectionBoxFields (): SelectionField[] {
-    return defaultItems.division.slice(0, 4).find(({ value }) => value === this.selectedFilters.division) !== undefined
+    return defaultItems.division.slice(0, 4).find(({ value }) => value === this.$route.query.division) !== undefined
       ? defaultSelectionFields.filter(({ id }) => id !== 'subdivision') : defaultSelectionFields
   }
 }
