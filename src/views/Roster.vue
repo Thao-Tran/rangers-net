@@ -7,9 +7,9 @@
           <div class="secondary roster-card-title-underline"></div>
         </div>
         <v-spacer/>
-        <v-btn outlined color="primary pa-2">
+        <v-btn text color="primary" class="export-btn pa-1">
           <v-icon>mdi-file-download</v-icon>
-          <div class="mx-1">Export</div>
+          <div class="mt-1">Export</div>
         </v-btn>
       </v-card-title>
       <v-card-text>
@@ -131,14 +131,22 @@ export default class RosterView extends Vue {
       width: 100%;
       height: 2px;
     }
+
+    .export-btn {
+      &.v-btn {
+        height: auto;
+        min-width: auto;
+
+        .v-btn__content {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
   }
 
   .default-text {
     width: 100%;
-  }
-
-  .no-data {
-    height: 100%;
   }
 }
 </style>
