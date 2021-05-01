@@ -43,6 +43,7 @@ import { defaultItems } from '@/components/SelectionBox.vue'
 import faker from 'faker'
 import Vue from 'vue'
 import Component from 'vue-class-component'
+import { DataTableHeader } from 'vuetify'
 
 interface Player {
   id: string
@@ -58,34 +59,40 @@ interface Player {
 export default class RosterView extends Vue {
   name = 'Roster'
   rosterStatus = 'Approved'
-  headers = [
+  headers: DataTableHeader[] = [
     {
       text: 'Name',
       value: 'name'
     },
     {
       text: 'GP',
-      value: 'gamesPlayed'
+      value: 'gamesPlayed',
+      align: 'end'
     },
     {
       text: 'G',
-      value: 'goals'
+      value: 'goals',
+      align: 'end'
     },
     {
       text: 'A',
-      value: 'assists'
+      value: 'assists',
+      align: 'end'
     },
     {
       text: 'A',
-      value: 'assists'
+      value: 'assists',
+      align: 'end'
     },
     {
       text: 'P',
-      value: 'points'
+      value: 'points',
+      align: 'end'
     },
     {
       text: 'PM',
-      value: 'penaltyMinutes'
+      value: 'penaltyMinutes',
+      align: 'end'
     }
   ]
 
