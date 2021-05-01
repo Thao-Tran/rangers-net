@@ -4,7 +4,6 @@
       {{ title }}
       <div class="secondary card-title-underline"></div>
     </div>
-    <v-spacer/>
     <slot/>
   </v-card-title>
 </template>

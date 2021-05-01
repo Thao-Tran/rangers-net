@@ -3,9 +3,8 @@
     <div v-if="this.teamName !== undefined" class="roster-content" :class="{ 'roster-content-grid': isPlayerSelected, 'd-flex flex-column': !isPlayerSelected }">
       <v-card v-if="this.teamName !== undefined" outlined class="roster-card d-flex flex-column">
         <card-title :title="teamName">
-          <v-btn text color="primary" class="export-btn pa-1">
-            <v-icon>mdi-file-download</v-icon>
-            <div class="mt-1">Export</div>
+          <v-btn icon color="primary" class="ml-2 pa-1" title="Export roster">
+            <v-icon>mdi-cloud-download</v-icon>
           </v-btn>
         </card-title>
         <v-card-text class="d-flex flex-column">
@@ -32,7 +31,26 @@
         </v-card-text>
       </v-card>
       <v-card v-if="isPlayerSelected" outlined class="player-card d-flex flex-column mt-2">
-        <card-title title="Player details"/>
+        <card-title :title="player.name"/>
+        <v-card-text class="grey--text text--darken-4">
+          <div class="d-flex justify-space-between">
+            <div v-for="(item, i) in playerDetailSection.items" :key="i" class="mr-2">
+              <span class="font-weight-medium">{{ item.label }}:</span>
+              {{ getPlayerField(item.field) }}
+            </div>
+          </div>
+          <v-divider class="my-4"/>
+          <div class="player-card-content">
+            <div v-for="(section, i) in contactDetailSections" :key="i" class="info-section d-flex">
+              <div class="info-section-content">
+                <div v-for="(item, itemIndex) in section.items" :key="itemIndex" class="info-section-item mb-3">
+                  <div class="font-weight-medium">{{ item.label }}</div>
+                  <div>{{ getPlayerField(item.field) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </v-card-text>
       </v-card>
     </div>
     <div v-else class="default-text d-flex align-center justify-center">
@@ -45,8 +63,10 @@
 import CardTitle from '@/components/CardTitle.vue'
 import { defaultItems } from '@/components/SelectionBox.vue'
 import faker from 'faker'
+import _ from 'lodash'
 import Vue from 'vue'
 import Component from 'vue-class-component'
+import { Watch } from 'vue-property-decorator'
 import { DataTableHeader } from 'vuetify'
 
 interface Player {
@@ -57,6 +77,10 @@ interface Player {
   assists: number
   points: number
   penaltyMinutes: number
+}
+
+interface PlayerDetailSection {
+  items: Array<{label: string, field: string}>
 }
 
 @Component({ components: { CardTitle } })
@@ -100,15 +124,95 @@ export default class RosterView extends Vue {
     }
   ]
 
-  players: Player[] = Array(20).fill(0).map((_, i) => ({
-    id: `${i}`,
-    name: `${faker.name.lastName()}, ${faker.name.firstName()}`,
-    gamesPlayed: faker.datatype.number(20),
-    goals: faker.datatype.number(20),
-    assists: faker.datatype.number(20),
-    points: faker.datatype.number(20),
-    penaltyMinutes: faker.datatype.number(5)
-  }))
+  playerDetailSection: PlayerDetailSection = {
+    items: [
+      {
+        label: 'Position',
+        field: 'position'
+      },
+      {
+        label: 'HCiD',
+        field: 'hcid'
+      },
+      {
+        label: 'Previous team',
+        field: 'prevTeam'
+      },
+      {
+        label: 'Rank',
+        field: 'rank'
+      },
+      {
+        label: 'Rating',
+        field: 'rating'
+      }
+    ]
+  }
+
+  contactDetailSections: PlayerDetailSection[] = [
+    {
+      items: [
+        {
+          label: 'Date of birth',
+          field: 'dob'
+        },
+        {
+          label: 'Phone',
+          field: 'phone'
+        },
+        {
+          label: 'Email',
+          field: 'email'
+        },
+        {
+          label: 'Address',
+          field: 'address'
+        }
+      ]
+    },
+    {
+      items: [
+        {
+          label: 'Parent name',
+          field: 'parent1.name'
+        },
+        {
+          label: 'Relationship',
+          field: 'parent1.relationship'
+        },
+        {
+          label: 'Phone',
+          field: 'parent1.phone'
+        },
+        {
+          label: 'Email',
+          field: 'parent1.email'
+        }
+      ]
+    },
+    {
+      items: [
+        {
+          label: 'Parent name',
+          field: 'parent2.name'
+        },
+        {
+          label: 'Relationship',
+          field: 'parent2.relationship'
+        },
+        {
+          label: 'Phone',
+          field: 'parent2.phone'
+        },
+        {
+          label: 'Email',
+          field: 'parent2.email'
+        }
+      ]
+    }
+  ]
+
+  players: Player[] = this.getPlayerData()
 
   get hasRosterData (): boolean {
     return this.players.length > 0
@@ -126,6 +230,64 @@ export default class RosterView extends Vue {
     const playerId = this.$route.query.player
     const player = this.players.find(({ id }) => id === playerId)
     return player ? [player] : []
+  }
+
+  get player (): Player | undefined {
+    return this.isPlayerSelected ? this.selectedPlayers[0] : undefined
+  }
+
+  @Watch('$route.query.team')
+  onTeamChanged (): void {
+    this.players = this.getPlayerData()
+  }
+
+  getPlayerData (): Player[] {
+    const players = Array(20).fill(0).map((_, i) => {
+      const firstName = faker.name.firstName()
+      const lastName = faker.name.lastName()
+      const parent1FirstName = faker.name.firstName()
+      const parent1LastName = faker.name.lastName()
+      const parent2FirstName = faker.name.firstName()
+      const parent2LastName = faker.name.lastName()
+
+      return {
+        id: `${i}`,
+        name: `${lastName}, ${firstName}`,
+        gamesPlayed: faker.datatype.number(20),
+        goals: faker.datatype.number(20),
+        assists: faker.datatype.number(20),
+        points: faker.datatype.number(20),
+        penaltyMinutes: faker.datatype.number(5),
+        position: 'Player',
+        hcid: faker.unique(faker.datatype.number, [{ min: 1000000, max: 1000700 }]),
+        prevTeam: faker.name.lastName(),
+        rank: faker.unique(faker.datatype.number, [{ max: 200 }], { maxRetries: 100 }),
+        rating: `${defaultItems.subdivision.find(({ value }) => value === this.$route.query.subdivision)?.text.charAt(0) ?? ''}${faker.datatype.number({ min: 20, max: 100 })}`,
+        dob: faker.datatype.datetime({ min: new Date('2003-01-01').getTime(), max: new Date('2011-01-01').getTime() }).toLocaleDateString(),
+        phone: faker.phone.phoneNumber(faker.phone.phoneNumberFormat(1)),
+        email: faker.internet.email(firstName, lastName, 'gmail.com'),
+        address: `${faker.address.streetAddress()}, Oakville, ON`,
+        parent1: {
+          name: `${parent1FirstName} ${parent1LastName}`,
+          relationship: 'Father',
+          phone: faker.phone.phoneNumber(faker.phone.phoneNumberFormat(1)),
+          email: faker.internet.email(parent1FirstName, parent1LastName, 'gmail.com')
+        },
+        parent2: {
+          name: `${parent2FirstName} ${parent2LastName}`,
+          relationship: 'Mother',
+          phone: faker.phone.phoneNumber(faker.phone.phoneNumberFormat(1)),
+          email: faker.internet.email(parent2FirstName, parent2LastName, 'gmail.com')
+        }
+      }
+    })
+    players[faker.datatype.number(20)].position = 'Goalie'
+
+    return players
+  }
+
+  getPlayerField (field: string): string | number {
+    return _.get(this.player, field)
   }
 }
 </script>
@@ -170,6 +332,32 @@ export default class RosterView extends Vue {
         .v-btn__content {
           display: flex;
           flex-direction: column;
+        }
+      }
+    }
+  }
+
+  .player-card {
+    .v-card__text {
+      height: 100%;
+    }
+
+    &-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      column-gap: 16px;
+
+      .info-section {
+
+        &-content {
+          width: 100%;
+        }
+
+        &-item {
+          display: grid;
+          grid-template-columns: 3fr 7fr;
+          column-gap: 8px;
+          width: 100%;
         }
       }
     }
