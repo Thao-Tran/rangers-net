@@ -2,7 +2,7 @@
   <v-app>
     <app-bar/>
     <v-main>
-      <router-view class="app-router-view"/>
+      <router-view class="app-router-view grey lighten-4"/>
     </v-main>
   </v-app>
 </template>
@@ -35,5 +35,9 @@ export default class App extends Vue {
 
 .app-router-view {
   height: 100%;
+}
+
+.route-with-nav-drawer {
+  display: flex;
 }
 </style>

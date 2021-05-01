@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="route-with-nav-drawer">
     <navigation-drawer title="General management" :sections="sections" :selectionBoxFields="selectionBoxFields"/>
     <router-view></router-view>
   </div>

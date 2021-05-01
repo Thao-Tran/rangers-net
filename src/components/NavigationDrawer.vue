@@ -58,6 +58,8 @@ export default class NavigationDrawer extends Vue {
 
 <style lang="scss">
 .v-navigation-drawer {
+  min-width: 290px;
+
   &__content {
     display: flex;
     flex-direction: column;
