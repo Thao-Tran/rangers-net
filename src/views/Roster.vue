@@ -18,6 +18,7 @@
             :items="players"
             :items-per-page=-1
             :value="selectedPlayers"
+            sort-by="name"
             fixed-header
             hide-default-footer
             dense
@@ -53,8 +54,10 @@
             :items="player.history"
             :items-per-page=-1
             :value="selectedHistory"
-            item-key="season"
             :height="selectedHistory.length > 0 ? '150px' : undefined"
+            item-key="season"
+            sort-by="season"
+            :sort-desc=true
             fixed-header
             hide-default-footer
             dense
