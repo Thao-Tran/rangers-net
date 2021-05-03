@@ -101,17 +101,17 @@ import { Watch } from 'vue-property-decorator'
 import { DataTableHeader } from 'vuetify'
 
 interface Evaluation {
-  total: number
-  agility: number
-  angles: number
-  teamPlay: number
-  glove: number
-  challenge: number
-  effectiveness: number
-  stick: number
-  clearRebounds: number
-  blocker: number
-  puckControl: number
+  total: string
+  agility: string
+  angles: string
+  teamPlay: string
+  glove: string
+  challenge: string
+  effectiveness: string
+  stick: string
+  clearRebounds: string
+  blocker: string
+  puckControl: string
   comments: string
 }
 
@@ -351,7 +351,20 @@ export default class RosterView extends Vue {
     const playerId = this.$route.query.player
     const player = this.players.find(({ id }) => id === playerId)
     const season = this.$route.query.season
-    return player?.history.filter((history) => history.season === season) ?? []
+    const selectedHistory = player?.history.filter((history) => history.season === season) ?? []
+
+    if (selectedHistory.length > 0) {
+      return selectedHistory
+    }
+
+    const latestHistory = player?.history.sort(({ season: seasonA }, { season: seasonB }) => {
+      if (seasonA === seasonB) {
+        return 0
+      }
+
+      return seasonB > seasonA ? 1 : -1
+    }).filter((_, i) => i === 0) ?? []
+    return latestHistory
   }
 
   get player (): Player | undefined {
@@ -405,16 +418,16 @@ export default class RosterView extends Vue {
         },
         history: Array(faker.datatype.number(4)).fill({}).map((_, i): HistoricalData => {
           const evaluation = {
-            agility: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
-            angles: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
-            teamPlay: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
-            glove: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
-            challenge: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
-            effectiveness: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
-            stick: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
-            clearRebounds: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
-            blocker: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
-            puckControl: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5])
+            agility: this.getEvaluation(),
+            angles: this.getEvaluation(),
+            teamPlay: this.getEvaluation(),
+            glove: this.getEvaluation(),
+            challenge: this.getEvaluation(),
+            effectiveness: this.getEvaluation(),
+            stick: this.getEvaluation(),
+            clearRebounds: this.getEvaluation(),
+            blocker: this.getEvaluation(),
+            puckControl: this.getEvaluation()
           }
 
           return {
@@ -431,7 +444,7 @@ export default class RosterView extends Vue {
             penaltyMinutes: faker.datatype.number(5),
             evaluation: {
               ...evaluation,
-              total: Object.values(evaluation).reduce((total, value) => total + value),
+              total: Object.values(evaluation).reduce((total, value) => total + parseFloat(value), 0).toFixed(1),
               comments: faker.lorem.paragraph(6)
             }
           }
@@ -448,6 +461,10 @@ export default class RosterView extends Vue {
 
   getPlayerField (field: string): string | number {
     return _.get(this.player, field)
+  }
+
+  getEvaluation (): string {
+    return (faker.datatype.number(10) + faker.random.arrayElement([0, 0.5])).toFixed(1)
   }
 }
 </script>
