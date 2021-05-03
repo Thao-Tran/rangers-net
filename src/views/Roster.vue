@@ -31,7 +31,7 @@
           </v-data-table>
         </v-card-text>
       </v-card>
-      <v-card v-if="isPlayerSelected" outlined class="player-card d-flex flex-column mt-2">
+      <v-card v-if="player !== undefined" outlined class="player-card d-flex flex-column mt-2">
         <card-title :title="player.name">
           <div class="text-h6 font-weight-regular ml-2" title="HCiD">(<a>{{ player.hcid }}</a>)</div>
         </card-title>
@@ -57,7 +57,7 @@
             :height="selectedHistory.length > 0 ? '150px' : undefined"
             item-key="season"
             sort-by="season"
-            :sort-desc=true
+            :sort-desc="true"
             fixed-header
             hide-default-footer
             dense
@@ -103,21 +103,6 @@ import Component from 'vue-class-component'
 import { Watch } from 'vue-property-decorator'
 import { DataTableHeader } from 'vuetify'
 
-interface Evaluation {
-  total: string
-  agility: string
-  angles: string
-  teamPlay: string
-  glove: string
-  challenge: string
-  effectiveness: string
-  stick: string
-  clearRebounds: string
-  blocker: string
-  puckControl: string
-  comments: string
-}
-
 interface HistoricalData {
   season: string
   team: string
@@ -130,11 +115,12 @@ interface HistoricalData {
   assists: number
   points: number
   penaltyMinutes: number
-  evaluation: Evaluation
+  evaluation: Record<string, string>
 }
 
 interface Player {
   id: string
+  hcid: string
   name: string
   dob: string
   phone: string
@@ -371,7 +357,7 @@ export default class RosterView extends Vue {
   }
 
   get player (): Player | undefined {
-    return this.isPlayerSelected ? this.selectedPlayers[0] : undefined
+    return this.selectedPlayers.length > 0 ? this.selectedPlayers[0] : undefined
   }
 
   @Watch('$route.query.team')
@@ -399,7 +385,7 @@ export default class RosterView extends Vue {
         penaltyMinutes: faker.datatype.number(5),
         position: 'Player',
         hand,
-        hcid: faker.unique(faker.datatype.number, [{ min: 1000000000, max: 1000700000 }]),
+        hcid: faker.unique(faker.datatype.number, [{ min: 1000000000, max: 1000700000 }]).toString(),
         prevTeam: faker.name.lastName(),
         rank: faker.unique(faker.datatype.number, [{ max: 200 }], { maxRetries: 100 }),
         rating: `${defaultItems.subdivision.find(({ value }) => value === this.$route.query.subdivision)?.text.charAt(0) ?? ''}${faker.datatype.number({ min: 20, max: 100 })}`,
