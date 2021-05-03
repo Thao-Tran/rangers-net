@@ -52,8 +52,9 @@
             :headers="historyHeaders"
             :items="player.history"
             :items-per-page=-1
-            :value="selectedSeasons"
+            :value="selectedHistory"
             item-key="season"
+            :height="selectedHistory.length > 0 ? '150px' : undefined"
             fixed-header
             hide-default-footer
             dense
@@ -64,6 +65,22 @@
               <router-link :to="{ query: { ...$route.query, season: item.season } }" v-text="item.season" class="text-decoration-none font-weight-medium"/>
             </template>
           </v-data-table>
+          <div v-if="selectedHistory.length > 0">
+            <v-divider class="mt-6 mb-4"/>
+            <div class="text-h6 mb-2">{{ selectedHistory[0].season }} Evaluation</div>
+            <div class="mb-2">
+              <span class="font-weight-bold">Total score:</span>
+              {{ selectedHistory[0].evaluation.total }}
+            </div>
+            <div class="evaluation">
+              <div v-for="(item, i) in evaluationDetailSection.items" :key="i">
+                <div class="font-weight-medium">{{ item.label }}</div>
+                <div>{{ selectedHistory[0].evaluation[item.field] }}</div>
+              </div>
+            </div>
+            <div class="text-subtitle-1 font-weight-medium mt-3 mb-1">Coach's comments</div>
+            <div>{{ selectedHistory[0].evaluation.comments }}</div>
+          </div>
         </v-card-text>
       </v-card>
     </div>
@@ -83,9 +100,26 @@ import Component from 'vue-class-component'
 import { Watch } from 'vue-property-decorator'
 import { DataTableHeader } from 'vuetify'
 
+interface Evaluation {
+  total: number
+  agility: number
+  angles: number
+  teamPlay: number
+  glove: number
+  challenge: number
+  effectiveness: number
+  stick: number
+  clearRebounds: number
+  blocker: number
+  puckControl: number
+  comments: string
+}
+
 interface HistoricalData {
   season: string
   team: string
+  position: string
+  hand: string
   rank: number
   rating: string
   gamesPlayed: number
@@ -93,6 +127,7 @@ interface HistoricalData {
   assists: number
   points: number
   penaltyMinutes: number
+  evaluation: Evaluation
 }
 
 interface Player {
@@ -102,6 +137,8 @@ interface Player {
   phone: string
   email: string
   address: string
+  position: string
+  hand: string
   gamesPlayed: number
   goals: number
   assists: number
@@ -126,6 +163,10 @@ export default class RosterView extends Vue {
     {
       text: 'Position',
       value: 'position'
+    },
+    {
+      text: 'Hand',
+      value: 'hand'
     },
     {
       text: 'GP',
@@ -227,6 +268,14 @@ export default class RosterView extends Vue {
       value: 'team'
     },
     {
+      text: 'Position',
+      value: 'position'
+    },
+    {
+      text: 'Hand',
+      value: 'hand'
+    },
+    {
       text: 'Rank',
       value: 'rank',
       align: 'end'
@@ -263,6 +312,21 @@ export default class RosterView extends Vue {
     }
   ]
 
+  evaluationDetailSection = {
+    items: [
+      { label: 'Agility', field: 'agility' },
+      { label: 'Angles', field: 'angles' },
+      { label: 'Team Play', field: 'teamPlay' },
+      { label: 'Glove', field: 'glove' },
+      { label: 'Challenge', field: 'challenge' },
+      { label: 'Effectiveness', field: 'effectiveness' },
+      { label: 'Stick', field: 'stick' },
+      { label: 'Clear rebounds', field: 'clearRebounds' },
+      { label: 'Blocker', field: 'blocker' },
+      { label: 'Puck control', field: 'puckControl' }
+    ]
+  }
+
   players: Player[] = this.getPlayerData()
 
   get hasRosterData (): boolean {
@@ -283,7 +347,7 @@ export default class RosterView extends Vue {
     return player ? [player] : []
   }
 
-  get selectedSeasons (): HistoricalData[] {
+  get selectedHistory (): HistoricalData[] {
     const playerId = this.$route.query.player
     const player = this.players.find(({ id }) => id === playerId)
     const season = this.$route.query.season
@@ -307,6 +371,7 @@ export default class RosterView extends Vue {
       const parent1LastName = faker.name.lastName()
       const parent2FirstName = faker.name.firstName()
       const parent2LastName = faker.name.lastName()
+      const hand = faker.random.arrayElement(['L', 'R'])
 
       return {
         id: `${i}`,
@@ -317,6 +382,7 @@ export default class RosterView extends Vue {
         points: faker.datatype.number(20),
         penaltyMinutes: faker.datatype.number(5),
         position: 'Player',
+        hand,
         hcid: faker.unique(faker.datatype.number, [{ min: 1000000000, max: 1000700000 }]),
         prevTeam: faker.name.lastName(),
         rank: faker.unique(faker.datatype.number, [{ max: 200 }], { maxRetries: 100 }),
@@ -337,22 +403,45 @@ export default class RosterView extends Vue {
           phone: faker.phone.phoneNumber(faker.phone.phoneNumberFormat(1)),
           email: faker.internet.email(parent2FirstName, parent2LastName, 'gmail.com')
         },
-        history: Array(faker.datatype.number(4)).fill({}).map((_, i) => {
+        history: Array(faker.datatype.number(4)).fill({}).map((_, i): HistoricalData => {
+          const evaluation = {
+            agility: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
+            angles: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
+            teamPlay: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
+            glove: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
+            challenge: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
+            effectiveness: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
+            stick: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
+            clearRebounds: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
+            blocker: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5]),
+            puckControl: faker.datatype.number(10) + faker.random.arrayElement([0, 0.5])
+          }
+
           return {
-            season: `${new Date().getFullYear() - i - 1}`,
+            season: `${new Date().getFullYear() - i - 1}/${new Date().getFullYear() - i - 2}`,
             team: faker.name.lastName(),
+            position: 'Player',
+            hand,
             rank: faker.unique(faker.datatype.number, [{ max: 200 }], { maxRetries: 100 }),
             rating: `${defaultItems.subdivision.find(({ value }) => value === this.$route.query.subdivision)?.text.charAt(0) ?? ''}${faker.datatype.number({ min: 20, max: 100 })}`,
             gamesPlayed: faker.datatype.number(20),
             goals: faker.datatype.number(20),
             assists: faker.datatype.number(20),
             points: faker.datatype.number(20),
-            penaltyMinutes: faker.datatype.number(5)
+            penaltyMinutes: faker.datatype.number(5),
+            evaluation: {
+              ...evaluation,
+              total: Object.values(evaluation).reduce((total, value) => total + value),
+              comments: faker.lorem.paragraph(6)
+            }
           }
         })
       }
     })
-    players[faker.datatype.number(20)].position = 'Goalie'
+
+    const goalieIndex = faker.datatype.number(20)
+    players[goalieIndex].position = 'Goalie'
+    players[goalieIndex].history = players[goalieIndex].history.map((history) => ({ ...history, position: 'Goalie' }))
 
     return players
   }
@@ -431,6 +520,12 @@ export default class RosterView extends Vue {
           width: 100%;
         }
       }
+    }
+
+    .evaluation {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      column-gap: 16px;
     }
   }
 
