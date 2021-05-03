@@ -14,9 +14,9 @@
           </div>
 
           <v-data-table
-            :headers="headers"
+            :headers="rosterHeaders"
             :items="players"
-            :items-per-page=20
+            :items-per-page=-1
             :value="selectedPlayers"
             fixed-header
             hide-default-footer
@@ -25,31 +25,45 @@
             class="mt-2"
           >
             <template v-slot:[`item.name`]="{ item }">
-              <router-link :to="{ query: { ...$route.query, player: item.id } }" v-text="item.name" class="text-uppercase text-decoration-none font-weight-medium"/>
+              <router-link :to="{ query: { ...$route.query, player: item.id, season: undefined } }" v-text="item.name" class="text-uppercase text-decoration-none font-weight-medium"/>
             </template>
           </v-data-table>
         </v-card-text>
       </v-card>
       <v-card v-if="isPlayerSelected" outlined class="player-card d-flex flex-column mt-2">
-        <card-title :title="player.name"/>
+        <card-title :title="player.name">
+          <div class="text-h6 font-weight-regular ml-2" title="HCiD">(<a>{{ player.hcid }}</a>)</div>
+        </card-title>
         <v-card-text class="grey--text text--darken-4">
-          <div class="d-flex justify-space-between">
-            <div v-for="(item, i) in playerDetailSection.items" :key="i" class="mr-2">
-              <span class="font-weight-medium">{{ item.label }}:</span>
-              {{ getPlayerField(item.field) }}
-            </div>
-          </div>
-          <v-divider class="my-4"/>
+          <div class="text-h6 mb-2">Contact info</div>
           <div class="player-card-content">
             <div v-for="(section, i) in contactDetailSections" :key="i" class="info-section d-flex">
               <div class="info-section-content">
                 <div v-for="(item, itemIndex) in section.items" :key="itemIndex" class="info-section-item mb-3">
                   <div class="font-weight-medium">{{ item.label }}</div>
-                  <div>{{ getPlayerField(item.field) }}</div>
+                  <div class="text-break">{{ getPlayerField(item.field) }}</div>
                 </div>
               </div>
             </div>
           </div>
+          <v-divider class="my-4"/>
+          <div class="text-h6 mb-2">History</div>
+          <v-data-table
+            :headers="historyHeaders"
+            :items="player.history"
+            :items-per-page=-1
+            :value="selectedSeasons"
+            item-key="season"
+            fixed-header
+            hide-default-footer
+            dense
+            single-select
+            class="mt-2"
+          >
+            <template v-slot:[`item.season`]="{ item }">
+              <router-link :to="{ query: { ...$route.query, season: item.season } }" v-text="item.season" class="text-decoration-none font-weight-medium"/>
+            </template>
+          </v-data-table>
         </v-card-text>
       </v-card>
     </div>
@@ -69,14 +83,31 @@ import Component from 'vue-class-component'
 import { Watch } from 'vue-property-decorator'
 import { DataTableHeader } from 'vuetify'
 
-interface Player {
-  id: string
-  name: string
+interface HistoricalData {
+  season: string
+  team: string
+  rank: number
+  rating: string
   gamesPlayed: number
   goals: number
   assists: number
   points: number
   penaltyMinutes: number
+}
+
+interface Player {
+  id: string
+  name: string
+  dob: string
+  phone: string
+  email: string
+  address: string
+  gamesPlayed: number
+  goals: number
+  assists: number
+  points: number
+  penaltyMinutes: number
+  history: HistoricalData[]
 }
 
 interface PlayerDetailSection {
@@ -87,10 +118,14 @@ interface PlayerDetailSection {
 export default class RosterView extends Vue {
   name = 'Roster'
   rosterStatus = 'Approved'
-  headers: DataTableHeader[] = [
+  rosterHeaders: DataTableHeader[] = [
     {
       text: 'Name',
       value: 'name'
+    },
+    {
+      text: 'Position',
+      value: 'position'
     },
     {
       text: 'GP',
@@ -100,11 +135,6 @@ export default class RosterView extends Vue {
     {
       text: 'G',
       value: 'goals',
-      align: 'end'
-    },
-    {
-      text: 'A',
-      value: 'assists',
       align: 'end'
     },
     {
@@ -123,31 +153,6 @@ export default class RosterView extends Vue {
       align: 'end'
     }
   ]
-
-  playerDetailSection: PlayerDetailSection = {
-    items: [
-      {
-        label: 'Position',
-        field: 'position'
-      },
-      {
-        label: 'HCiD',
-        field: 'hcid'
-      },
-      {
-        label: 'Previous team',
-        field: 'prevTeam'
-      },
-      {
-        label: 'Rank',
-        field: 'rank'
-      },
-      {
-        label: 'Rating',
-        field: 'rating'
-      }
-    ]
-  }
 
   contactDetailSections: PlayerDetailSection[] = [
     {
@@ -212,6 +217,52 @@ export default class RosterView extends Vue {
     }
   ]
 
+  historyHeaders: DataTableHeader[] = [
+    {
+      text: 'Season',
+      value: 'season'
+    },
+    {
+      text: 'Team',
+      value: 'team'
+    },
+    {
+      text: 'Rank',
+      value: 'rank',
+      align: 'end'
+    },
+    {
+      text: 'Rating',
+      value: 'rating',
+      align: 'end'
+    },
+    {
+      text: 'GP',
+      value: 'gamesPlayed',
+      align: 'end'
+    },
+    {
+      text: 'G',
+      value: 'goals',
+      align: 'end'
+    },
+    {
+      text: 'A',
+      value: 'assists',
+      align: 'end'
+    },
+    {
+      text: 'P',
+      value: 'points',
+      align: 'end'
+    },
+    {
+      text: 'PM',
+      value: 'penaltyMinutes',
+      align: 'end'
+    }
+  ]
+
   players: Player[] = this.getPlayerData()
 
   get hasRosterData (): boolean {
@@ -230,6 +281,13 @@ export default class RosterView extends Vue {
     const playerId = this.$route.query.player
     const player = this.players.find(({ id }) => id === playerId)
     return player ? [player] : []
+  }
+
+  get selectedSeasons (): HistoricalData[] {
+    const playerId = this.$route.query.player
+    const player = this.players.find(({ id }) => id === playerId)
+    const season = this.$route.query.season
+    return player?.history.filter((history) => history.season === season) ?? []
   }
 
   get player (): Player | undefined {
@@ -259,7 +317,7 @@ export default class RosterView extends Vue {
         points: faker.datatype.number(20),
         penaltyMinutes: faker.datatype.number(5),
         position: 'Player',
-        hcid: faker.unique(faker.datatype.number, [{ min: 1000000, max: 1000700 }]),
+        hcid: faker.unique(faker.datatype.number, [{ min: 1000000000, max: 1000700000 }]),
         prevTeam: faker.name.lastName(),
         rank: faker.unique(faker.datatype.number, [{ max: 200 }], { maxRetries: 100 }),
         rating: `${defaultItems.subdivision.find(({ value }) => value === this.$route.query.subdivision)?.text.charAt(0) ?? ''}${faker.datatype.number({ min: 20, max: 100 })}`,
@@ -278,7 +336,20 @@ export default class RosterView extends Vue {
           relationship: 'Mother',
           phone: faker.phone.phoneNumber(faker.phone.phoneNumberFormat(1)),
           email: faker.internet.email(parent2FirstName, parent2LastName, 'gmail.com')
-        }
+        },
+        history: Array(faker.datatype.number(4)).fill({}).map((_, i) => {
+          return {
+            season: `${new Date().getFullYear() - i - 1}`,
+            team: faker.name.lastName(),
+            rank: faker.unique(faker.datatype.number, [{ max: 200 }], { maxRetries: 100 }),
+            rating: `${defaultItems.subdivision.find(({ value }) => value === this.$route.query.subdivision)?.text.charAt(0) ?? ''}${faker.datatype.number({ min: 20, max: 100 })}`,
+            gamesPlayed: faker.datatype.number(20),
+            goals: faker.datatype.number(20),
+            assists: faker.datatype.number(20),
+            points: faker.datatype.number(20),
+            penaltyMinutes: faker.datatype.number(5)
+          }
+        })
       }
     })
     players[faker.datatype.number(20)].position = 'Goalie'
@@ -303,7 +374,7 @@ export default class RosterView extends Vue {
 
     &.roster-content-grid {
       display: grid;
-      grid-template-rows: 1fr 1fr;
+      grid-template-rows: 1fr 2fr;
 
       .v-data-table {
         overflow: hidden;
@@ -355,7 +426,7 @@ export default class RosterView extends Vue {
 
         &-item {
           display: grid;
-          grid-template-columns: 3fr 7fr;
+          grid-template-columns: 86px auto;
           column-gap: 8px;
           width: 100%;
         }
