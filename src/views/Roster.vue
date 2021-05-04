@@ -75,7 +75,7 @@
                       class="mt-2"
                     >
                       <template v-slot:[`item.completed`]="{ item }">
-                        <v-icon v-if="item.completed">check</v-icon>
+                        <v-icon v-if="item.completed">mdi-check</v-icon>
                       </template>
                       <template v-slot:[`item.downloadLink`]>
                         <a>Download</a>
@@ -365,7 +365,7 @@ export default class RosterView extends Vue {
     { text: 'Type', value: 'type' },
     { text: 'Requested on', value: 'time' },
     { text: 'Requested by', value: 'requester' },
-    { text: 'Completed', value: 'completed' },
+    { text: 'Completed', value: 'completed', align: 'center' },
     { text: 'Status', value: 'status' },
     { text: 'Download', value: 'downloadLink' }
   ]
@@ -536,7 +536,7 @@ export default class RosterView extends Vue {
             }
           }
         }),
-        suspensions: Array(faker.datatype.number(6)).fill({}).map((_value, i): Suspension => {
+        suspensions: Array(faker.datatype.number(6)).fill({}).map((): Suspension => {
           const length = faker.datatype.number(3)
           return {
             gameId: faker.datatype.number(20).toString(),
