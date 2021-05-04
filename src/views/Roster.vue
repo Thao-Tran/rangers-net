@@ -35,7 +35,7 @@
         <card-title :title="player.name">
           <div class="text-h6 font-weight-regular ml-2" title="HCiD">(<a>{{ player.hcid }}</a>)</div>
         </card-title>
-        <v-card-text class="grey--text text--darken-4">
+        <v-card-text class="grey--text text--darken-4 d-flex flex-column">
           <div class="text-h6 mb-2">Contact info</div>
           <div class="player-card-content">
             <div v-for="(section, i) in contactDetailSections" :key="i" class="info-section d-flex">
@@ -68,21 +68,27 @@
               <router-link :to="{ query: { ...$route.query, season: item.season } }" v-text="item.season" class="text-decoration-none font-weight-medium"/>
             </template>
           </v-data-table>
+          <v-divider class="mt-6 mb-4"/>
+          <div class="text-h6 mb-2">
+            <span v-if="selectedHistory.length > 0">{{ selectedHistory[0].season }} </span>
+            Evaluation
+          </div>
           <div v-if="selectedHistory.length > 0">
-            <v-divider class="mt-6 mb-4"/>
-            <div class="text-h6 mb-2">{{ selectedHistory[0].season }} Evaluation</div>
             <div class="mb-2">
               <span class="font-weight-bold">Total score:</span>
               {{ selectedHistory[0].evaluation.total }}
             </div>
             <div class="evaluation">
-              <div v-for="(item, i) in evaluationDetailSection.items" :key="i">
-                <div class="font-weight-medium">{{ item.label }}</div>
+              <div v-for="(item, i) in evaluationDetailSection.items" :key="i" class="d-flex">
+                <div class="font-weight-medium mr-2">{{ item.label }}</div>
                 <div>{{ selectedHistory[0].evaluation[item.field] }}</div>
               </div>
             </div>
             <div class="text-subtitle-1 font-weight-medium mt-3 mb-1">Coach's comments</div>
             <div>{{ selectedHistory[0].evaluation.comments }}</div>
+          </div>
+          <div v-else class="evaluation-default-text d-flex flex-grow-1 align-center justify-center">
+            No previous evaluations
           </div>
         </v-card-text>
       </v-card>
