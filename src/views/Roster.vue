@@ -51,7 +51,17 @@
           <div>
             <v-tabs v-model="historyTab">
               <v-tab key="history">History</v-tab>
-              <v-tab key="suspensions">Suspensions</v-tab>
+              <v-tab key="suspensions">
+                <div class="d-flex align-center">
+                  Suspensions
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon small class="ml-1" v-bind="attrs" v-on="on">mdi-information-outline</v-icon>
+                    </template>
+                    <span>Allow 48 hours for record updates to be reflected</span>
+                  </v-tooltip>
+                </div>
+              </v-tab>
             </v-tabs>
           </div>
           <div class="history-tables d-flex flex-grow-1 flex-column">
