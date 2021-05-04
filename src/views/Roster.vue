@@ -48,26 +48,49 @@
             </div>
           </div>
           <v-divider class="my-4"/>
-          <div class="text-h6 mb-2">History</div>
-          <v-data-table
-            :headers="historyHeaders"
-            :items="player.history"
-            :items-per-page=-1
-            :value="selectedHistory"
-            :height="selectedHistory.length > 0 ? '150px' : undefined"
-            item-key="season"
-            sort-by="season"
-            :sort-desc="true"
-            fixed-header
-            hide-default-footer
-            dense
-            single-select
-            class="mt-2"
-          >
-            <template v-slot:[`item.season`]="{ item }">
-              <router-link :to="{ query: { ...$route.query, season: item.season } }" v-text="item.season" class="text-decoration-none font-weight-medium"/>
-            </template>
-          </v-data-table>
+          <div>
+            <v-tabs v-model="historyTab">
+              <v-tab key="history">History</v-tab>
+              <v-tab key="suspensions">Suspensions</v-tab>
+            </v-tabs>
+          </div>
+          <div class="history-tables d-flex flex-grow-1 flex-column">
+            <v-tabs-items v-model="historyTab">
+              <v-tab-item key="history">
+                <v-data-table
+                  :headers="historyHeaders"
+                  :items="player.history"
+                  :items-per-page=-1
+                  :value="selectedHistory"
+                  item-key="season"
+                  sort-by="season"
+                  :sort-desc="true"
+                  fixed-header
+                  hide-default-footer
+                  dense
+                  single-select
+                  class="mt-2"
+                >
+                  <template v-slot:[`item.season`]="{ item }">
+                    <router-link :to="{ query: { ...$route.query, season: item.season } }" v-text="item.season" class="text-decoration-none font-weight-medium"/>
+                  </template>
+                </v-data-table>
+              </v-tab-item>
+              <v-tab-item key="suspensions">
+                <v-data-table
+                  :headers="suspensionHeaders"
+                  :items="player.suspensions"
+                  :items-per-page=-1
+                  item-key="gameId"
+                  sort-by="gameId"
+                  fixed-header
+                  hide-default-footer
+                  dense
+                  class="mt-2"
+                />
+              </v-tab-item>
+            </v-tabs-items>
+          </div>
           <v-divider class="mt-6 mb-4"/>
           <div class="text-h6 mb-2">
             <span v-if="selectedHistory.length > 0">{{ selectedHistory[0].season }} </span>
@@ -124,6 +147,15 @@ interface HistoricalData {
   evaluation: Record<string, string>
 }
 
+interface Suspension {
+  gameId: string
+  time: string
+  team: string
+  infraction: string
+  length: string
+  served: string
+}
+
 interface Player {
   id: string
   hcid: string
@@ -140,6 +172,7 @@ interface Player {
   points: number
   penaltyMinutes: number
   history: HistoricalData[]
+  suspensions: Suspension[]
 }
 
 interface PlayerDetailSection {
@@ -151,160 +184,64 @@ export default class RosterView extends Vue {
   name = 'Roster'
   rosterStatus = 'Approved'
   rosterHeaders: DataTableHeader[] = [
-    {
-      text: 'Name',
-      value: 'name'
-    },
-    {
-      text: 'Position',
-      value: 'position'
-    },
-    {
-      text: 'Hand',
-      value: 'hand'
-    },
-    {
-      text: 'GP',
-      value: 'gamesPlayed',
-      align: 'end'
-    },
-    {
-      text: 'G',
-      value: 'goals',
-      align: 'end'
-    },
-    {
-      text: 'A',
-      value: 'assists',
-      align: 'end'
-    },
-    {
-      text: 'P',
-      value: 'points',
-      align: 'end'
-    },
-    {
-      text: 'PM',
-      value: 'penaltyMinutes',
-      align: 'end'
-    }
+    { text: 'Name', value: 'name' },
+    { text: 'Position', value: 'position' },
+    { text: 'Hand', value: 'hand' },
+    { text: 'GP', value: 'gamesPlayed', align: 'end' },
+    { text: 'G', value: 'goals', align: 'end' },
+    { text: 'A', value: 'assists', align: 'end' },
+    { text: 'P', value: 'points', align: 'end' },
+    { text: 'PM', value: 'penaltyMinutes', align: 'end' }
   ]
 
   contactDetailSections: PlayerDetailSection[] = [
     {
       items: [
-        {
-          label: 'Date of birth',
-          field: 'dob'
-        },
-        {
-          label: 'Phone',
-          field: 'phone'
-        },
-        {
-          label: 'Email',
-          field: 'email'
-        },
-        {
-          label: 'Address',
-          field: 'address'
-        }
+        { label: 'Date of birth', field: 'dob' },
+        { label: 'Phone', field: 'phone' },
+        { label: 'Email', field: 'email' },
+        { label: 'Address', field: 'address' }
       ]
     },
     {
       items: [
-        {
-          label: 'Parent name',
-          field: 'parent1.name'
-        },
-        {
-          label: 'Relationship',
-          field: 'parent1.relationship'
-        },
-        {
-          label: 'Phone',
-          field: 'parent1.phone'
-        },
-        {
-          label: 'Email',
-          field: 'parent1.email'
-        }
+        { label: 'Parent name', field: 'parent1.name' },
+        { label: 'Relationship', field: 'parent1.relationship' },
+        { label: 'Phone', field: 'parent1.phone' },
+        { label: 'Email', field: 'parent1.email' }
       ]
     },
     {
       items: [
-        {
-          label: 'Parent name',
-          field: 'parent2.name'
-        },
-        {
-          label: 'Relationship',
-          field: 'parent2.relationship'
-        },
-        {
-          label: 'Phone',
-          field: 'parent2.phone'
-        },
-        {
-          label: 'Email',
-          field: 'parent2.email'
-        }
+        { label: 'Parent name', field: 'parent2.name' },
+        { label: 'Relationship', field: 'parent2.relationship' },
+        { label: 'Phone', field: 'parent2.phone' },
+        { label: 'Email', field: 'parent2.email' }
       ]
     }
   ]
 
   historyHeaders: DataTableHeader[] = [
-    {
-      text: 'Season',
-      value: 'season'
-    },
-    {
-      text: 'Team',
-      value: 'team'
-    },
-    {
-      text: 'Position',
-      value: 'position'
-    },
-    {
-      text: 'Hand',
-      value: 'hand'
-    },
-    {
-      text: 'Rank',
-      value: 'rank',
-      align: 'end'
-    },
-    {
-      text: 'Rating',
-      value: 'rating',
-      align: 'end'
-    },
-    {
-      text: 'GP',
-      value: 'gamesPlayed',
-      align: 'end'
-    },
-    {
-      text: 'G',
-      value: 'goals',
-      align: 'end'
-    },
-    {
-      text: 'A',
-      value: 'assists',
-      align: 'end'
-    },
-    {
-      text: 'P',
-      value: 'points',
-      align: 'end'
-    },
-    {
-      text: 'PM',
-      value: 'penaltyMinutes',
-      align: 'end'
-    }
+    { text: 'Season', value: 'season' },
+    { text: 'Team', value: 'team' },
+    { text: 'Position', value: 'position' },
+    { text: 'Hand', value: 'hand' },
+    { text: 'Rank', value: 'rank', align: 'end' },
+    { text: 'Rating', value: 'rating', align: 'end' },
+    { text: 'GP', value: 'gamesPlayed', align: 'end' },
+    { text: 'G', value: 'goals', align: 'end' },
+    { text: 'A', value: 'assists', align: 'end' },
+    { text: 'P', value: 'points', align: 'end' },
+    { text: 'PM', value: 'penaltyMinutes', align: 'end' }
+  ]
+
+  suspensionHeaders: DataTableHeader[] = [
+    { text: 'Game ID', value: 'gameId' },
+    { text: 'Date time', value: 'time' },
+    { text: 'Team', value: 'team' },
+    { text: 'Infraction', value: 'infraction' },
+    { text: 'Length', value: 'length' },
+    { text: 'Served', value: 'served' }
   ]
 
   evaluationDetailSection = {
@@ -323,6 +260,8 @@ export default class RosterView extends Vue {
   }
 
   players: Player[] = this.getPlayerData()
+
+  historyTab: string | null = null
 
   get hasRosterData (): boolean {
     return this.players.length > 0
@@ -372,7 +311,7 @@ export default class RosterView extends Vue {
   }
 
   getPlayerData (): Player[] {
-    const players = Array(20).fill(0).map((_, i) => {
+    const players = Array(20).fill(0).map((_value, i) => {
       const firstName = faker.name.firstName()
       const lastName = faker.name.lastName()
       const parent1FirstName = faker.name.firstName()
@@ -411,7 +350,7 @@ export default class RosterView extends Vue {
           phone: faker.phone.phoneNumber(faker.phone.phoneNumberFormat(1)),
           email: faker.internet.email(parent2FirstName, parent2LastName, 'gmail.com')
         },
-        history: Array(faker.datatype.number(4)).fill({}).map((_, i): HistoricalData => {
+        history: Array(faker.datatype.number(10)).fill({}).map((_value, i): HistoricalData => {
           const evaluation = {
             agility: this.getEvaluation(),
             angles: this.getEvaluation(),
@@ -443,11 +382,22 @@ export default class RosterView extends Vue {
               comments: faker.lorem.paragraph(6)
             }
           }
+        }),
+        suspensions: Array(faker.datatype.number(6)).fill({}).map((_value, i): Suspension => {
+          const length = faker.datatype.number(3)
+          return {
+            gameId: faker.datatype.number(20).toString(),
+            time: faker.date.recent().toLocaleString(undefined, { timeStyle: 'short', dateStyle: 'short' }),
+            team: faker.name.lastName(),
+            infraction: _.startCase(faker.lorem.words()),
+            length: `${length} Game${length > 1 ? 's' : ''}`,
+            served: `${length} Game${length > 1 ? 's' : ''}`
+          }
         })
       }
     })
 
-    const goalieIndex = faker.datatype.number(20)
+    const goalieIndex = faker.datatype.number(19)
     players[goalieIndex].position = 'Goalie'
     players[goalieIndex].history = players[goalieIndex].history.map((history) => ({ ...history, position: 'Goalie' }))
 
@@ -538,6 +488,12 @@ export default class RosterView extends Vue {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
       column-gap: 16px;
+    }
+
+    .history-tables {
+      .v-data-table__wrapper {
+        max-height: 150px;
+      }
     }
   }
 
