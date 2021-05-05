@@ -18,10 +18,9 @@
 </template>
 
 <script lang="ts">
-import faker from 'faker'
+import _ from 'lodash-es'
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { Prop } from 'vue-property-decorator'
 
 export interface SelectionField {
   id: string
@@ -34,109 +33,38 @@ export interface SelectionItem {
   text: string
 }
 
-export const defaultSelectionFields = [
-  {
-    id: 'league',
-    label: 'League',
-    endpoint: '/leagues'
-  },
-  {
-    id: 'division',
-    label: 'Division',
-    endpoint: '/divisions'
-  },
-  {
-    id: 'subdivision',
-    label: 'Subdivision',
-    endpoint: '/subdivisions'
-  },
-  {
-    id: 'team',
-    label: 'Team',
-    endpoint: '/teams'
-  }
-]
-
-export const defaultItems: Record<string, SelectionItem[]> = {
-  league: [{ text: 'House', value: '1' }, { text: 'Rep', value: '2' }],
-  division: [
-    {
-      text: 'U5',
-      value: '1'
-    },
-    {
-      text: 'U7',
-      value: '2'
-    },
-    {
-      text: 'U8',
-      value: '3'
-    },
-    {
-      text: 'U9',
-      value: '4'
-    },
-    {
-      text: 'U10',
-      value: '5'
-    },
-    {
-      text: 'U11',
-      value: '6'
-    },
-    {
-      text: 'U12',
-      value: '7'
-    },
-    {
-      text: 'U13',
-      value: '8'
-    },
-    {
-      text: 'U14',
-      value: '9'
-    },
-    {
-      text: 'U15',
-      value: '10'
-    },
-    {
-      text: 'U16',
-      value: '11'
-    },
-    {
-      text: 'U18',
-      value: '12'
-    },
-    {
-      text: 'U21',
-      value: '13'
-    }
-  ],
-  subdivision: [{ text: 'Red', value: '1' }, { text: 'White', value: '2' }],
-  team: Array(faker.datatype.number({ min: 5, max: 10 })).fill('').map((_, i) => ({ value: `${i}`, text: faker.name.lastName().toUpperCase() }))
-}
-
 @Component
 export default class SelectionBox extends Vue {
   name = 'SelectionBox'
 
-  @Prop({ type: Array, default: () => defaultSelectionFields }) readonly fields!: SelectionField[]
+  fields = [
+    { id: 'league', label: 'League' },
+    { id: 'division', label: 'Division' },
+    { id: 'subDivision', label: 'Sub-division' },
+    { id: 'team', label: 'Team' }
+  ]
 
   get items (): Record<string, SelectionItem[]> {
     return {
-      league: defaultItems.league,
-      ...this.fields.slice(1).reduce((items, { id }, i) => {
+      league: this.convertToSelectionItems(this.$store.state.leagues),
+      ...this.fields.slice(1).reduce(({ items, key }, { id }, i) => {
         const dependentValue = this.$route.query[this.fields[i]?.id]
         if (dependentValue === undefined) {
-          return items
+          return { items, key }
         }
 
+        const dependentIndex = _.get<any[]>(this.$store.state, key, []).findIndex(({ id }) => id === dependentValue)
+
+        const newKey = `${key}[${dependentIndex}].${id}s`
+
         return {
-          ...items,
-          [id]: defaultItems[id]
+          items: {
+            ...items,
+            [id]: this.convertToSelectionItems(_.get(this.$store.state, newKey, []))
+          },
+          key: newKey
         }
-      }, {})
+      }, { items: {}, key: 'leagues' }).items
     }
   }
 
@@ -151,6 +79,16 @@ export default class SelectionBox extends Vue {
     const selectedValue = { ...prevSelectedValues, [fieldId]: value }
 
     this.$router.push({ query: selectedValue })
+  }
+
+  convertToSelectionItems (items: Array<{ id: string, name: string }>): SelectionItem[] {
+    return items.map(({ id: value, name: text }) => {
+      return { value, text }
+    })
+  }
+
+  created (): void {
+    this.$store.commit('getLeagues')
   }
 }
 </script>
