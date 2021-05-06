@@ -164,7 +164,7 @@
                   hide-default-footer
                   dense
                   single-select
-                  class="mt-2"
+                  class="mt-2 text-no-wrap text-truncate"
                 >
                   <template v-slot:[`item.season`]="{ item }">
                     <router-link :to="{ query: { ...$route.query, season: item.season } }" v-text="item.season" class="text-decoration-none font-weight-medium"/>
@@ -191,7 +191,7 @@
             <span v-if="selectedHistory.length > 0">{{ selectedHistory[0].season }} </span>
             Evaluation
           </div>
-          <div v-if="selectedHistory.length > 0">
+          <div v-if="selectedHistory.length > 0" class="d-flex flex-grow-1 flex-column">
             <div class="mb-2">
               <span class="font-weight-bold">Total score:</span>
               {{ selectedHistory[0].evaluation.total }}
@@ -278,18 +278,18 @@ export default class RosterView extends Vue {
     },
     {
       items: [
-        { label: 'Parent name', field: 'parent[0].name' },
-        { label: 'Relationship', field: 'parent[0].relationship' },
-        { label: 'Phone', field: 'parent[0].phone' },
-        { label: 'Email', field: 'parent[0].email' }
+        { label: 'Parent name', field: 'parents[0].name' },
+        { label: 'Relationship', field: 'parents[0].relationship' },
+        { label: 'Phone', field: 'parents[0].phone' },
+        { label: 'Email', field: 'parents[0].email' }
       ]
     },
     {
       items: [
-        { label: 'Parent name', field: 'parent[1].name' },
-        { label: 'Relationship', field: 'parent[1].relationship' },
-        { label: 'Phone', field: 'parent[1].phone' },
-        { label: 'Email', field: 'parent[1].email' }
+        { label: 'Parent name', field: 'parents[1].name' },
+        { label: 'Relationship', field: 'parents[1].relationship' },
+        { label: 'Phone', field: 'parents[1].phone' },
+        { label: 'Email', field: 'parents[1].email' }
       ]
     }
   ]
@@ -433,11 +433,7 @@ export default class RosterView extends Vue {
     return _.get(this.player, field)
   }
 
-  getIndexOfId (arr: Array<{ id?: string }> = [], id = ''): number {
-    return arr.findIndex((el) => el.id === id)
-  }
-
-  @Watch('$route.query.team')
+  @Watch('teamName')
   updatePlayers (): void {
     this.players = this.getPlayers()
   }
@@ -455,7 +451,7 @@ export default class RosterView extends Vue {
 
     &.roster-content-grid {
       display: grid;
-      grid-template-rows: 1fr 2fr;
+      grid-template-rows: 1fr 1fr;
 
       .v-data-table {
         overflow: hidden;
@@ -521,8 +517,10 @@ export default class RosterView extends Vue {
     }
 
     .history-tables {
+      max-height: 200px;
+
       .v-data-table__wrapper {
-        max-height: 150px;
+        max-height: 200px;
       }
     }
   }
