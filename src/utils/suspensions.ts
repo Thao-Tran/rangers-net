@@ -15,6 +15,7 @@ export function getSuspensions (): Suspension[] {
     const length = faker.datatype.number(3)
     return {
       gameId: faker.datatype.number(20).toString(),
+      // @ts-ignore: timeStyle does not exist in type 'DateTimeFormatOptions'
       time: faker.date.recent().toLocaleString(undefined, { timeStyle: 'short', dateStyle: 'short' }),
       team: faker.name.lastName(),
       infraction: _.startCase(faker.lorem.words()),

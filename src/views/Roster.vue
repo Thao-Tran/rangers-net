@@ -1,7 +1,7 @@
 <template>
   <div class="roster d-flex">
-    <div v-if="this.teamName !== undefined" class="roster-content" :class="{ 'roster-content-grid': isPlayerSelected, 'd-flex flex-column': !isPlayerSelected }">
-      <v-card v-if="this.teamName !== undefined" outlined class="roster-card d-flex flex-column">
+    <div v-if="this.teamName !== undefined" class="roster-content d-flex flex-column">
+      <v-card v-if="this.teamName !== undefined" outlined class="roster-card d-flex flex-column flex-grow-1">
         <card-title :title="teamName">
           <v-dialog v-model="isDownloadDialogVisible" max-width="850px">
             <template v-slot:activator="{ on, attrs }">
@@ -108,7 +108,7 @@
             hide-default-footer
             dense
             single-select
-            class="mt-2"
+            class="roster-table mt-2 d-flex flex-column"
           >
             <template v-slot:[`item.name`]="{ item }">
               <router-link :to="{ query: { ...$route.query, player: item.id, season: undefined } }" v-text="item.name" class="text-uppercase text-decoration-none font-weight-medium"/>
@@ -116,7 +116,7 @@
           </v-data-table>
         </v-card-text>
       </v-card>
-      <v-card v-if="player !== undefined" outlined class="player-card d-flex flex-column mt-2">
+      <v-card v-if="player !== undefined" outlined class="player-card d-flex flex-column flex-grow-1 mt-2">
         <card-title :title="player.name">
           <div class="text-h6 font-weight-regular ml-2" title="HCiD">(<a>{{ player.hcid }}</a>)</div>
         </card-title>
@@ -358,6 +358,7 @@ export default class RosterView extends Vue {
   rosterRequests: RosterRequest[] = Array(faker.datatype.number(6)).fill({}).map((): RosterRequest => {
     return {
       type: faker.random.arrayElement(['Official', 'Excel']),
+      // @ts-ignore: timeStyle does not exist in type 'DateTimeFormatOptions'
       time: faker.date.recent().toLocaleString(undefined, { timeStyle: 'short', dateStyle: 'short' }),
       requester: faker.internet.email(),
       completed: faker.datatype.boolean(),
@@ -483,6 +484,10 @@ export default class RosterView extends Vue {
         }
       }
     }
+
+    .roster-table {
+      max-height: calc(100% - 36px);
+    }
   }
 
   .player-card {
@@ -517,10 +522,8 @@ export default class RosterView extends Vue {
     }
 
     .history-tables {
-      max-height: 200px;
-
       .v-data-table__wrapper {
-        max-height: 200px;
+        max-height: 194px;
       }
     }
   }
