@@ -1,4 +1,4 @@
-import { getEvaluation } from '@/utils/evaluations'
+import { Evaluation, getEvaluation } from '@/utils/evaluations'
 import { getSuspensions, Suspension } from '@/utils/suspensions'
 import faker from 'faker'
 
@@ -24,7 +24,7 @@ export interface Stats {
   assists: number
   points: number
   penaltyMinutes: number
-  evaluation: Record<string, string>,
+  evaluation: Evaluation,
   suspensions: Suspension[]
 }
 

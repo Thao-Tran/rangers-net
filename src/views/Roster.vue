@@ -486,7 +486,7 @@ export default class RosterView extends Vue {
     }
 
     .roster-table {
-      max-height: calc(100% - 36px);
+      max-height: calc(100% - 30px);
     }
   }
 

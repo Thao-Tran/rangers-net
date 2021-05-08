@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '@/views/Home.vue'
 import GeneralManagement from '@/views/GeneralManagement.vue'
 import Roster from '@/views/Roster.vue'
+import PlayerEvaluation from '@/views/evaluations/PlayerEvaluation.vue'
 
 Vue.use(VueRouter)
 
@@ -38,6 +39,13 @@ const routes: Array<RouteConfig> = [
         component: Roster,
         meta: {
           title: 'General | Roster'
+        }
+      },
+      {
+        path: 'player-evaluation',
+        component: PlayerEvaluation,
+        meta: {
+          title: 'Evaluations | Player'
         }
       }
     ]

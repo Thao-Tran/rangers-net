@@ -45,7 +45,7 @@ export default class GeneralManagement extends Vue {
     {
       title: 'Evaluations',
       items: [
-        { label: 'Players' },
+        { label: 'Players', route: `${ROUTE_PATH}/player-evaluation` },
         { label: 'Coaches' },
         { label: 'Completed' },
         { label: 'Missing' }
