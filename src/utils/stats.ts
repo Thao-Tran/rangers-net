@@ -3,7 +3,8 @@ import { getSuspensions, Suspension } from '@/utils/suspensions'
 import faker from 'faker'
 
 export enum Position {
-  Player = 'Player',
+  Forward = 'Forward',
+  Defense = 'Defense',
   Goalie = 'Goalie'
 }
 
@@ -33,7 +34,7 @@ export function getPlayerStats (team: string): Stats[] {
     return {
       season: `${new Date().getFullYear() - i}/${new Date().getFullYear() - i - 1}`,
       team,
-      position: Position.Player,
+      position: faker.random.arrayElement([Position.Forward, Position.Defense]),
       hand: faker.random.arrayElement(Object.values(Hand)),
       rank: i === 0 ? undefined : faker.datatype.number(200),
       rating: i === 0 ? undefined : faker.datatype.number(100).toString(),

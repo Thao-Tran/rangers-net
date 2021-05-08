@@ -91,13 +91,13 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </card-title>
-        <v-card-text class="d-flex flex-column">
-          <div>
+          <v-spacer/>
+          <div class="grey--text text--darken-4 subtitle-1">
             <span class="font-weight-bold">Roster status:</span>
             {{this.rosterStatus}}
           </div>
-
+        </card-title>
+        <v-card-text class="d-flex flex-column">
           <v-data-table
             :headers="rosterHeaders"
             :items="roster"
@@ -111,7 +111,15 @@
             class="roster-table mt-2 d-flex flex-column"
           >
             <template v-slot:[`item.name`]="{ item }">
-              <router-link :to="{ query: { ...$route.query, player: item.id, season: undefined } }" v-text="item.name" class="text-uppercase text-decoration-none font-weight-medium"/>
+              <div class="d-flex align-center">
+                <router-link
+                  :to="{ query: { ...$route.query, player: item.id, season: undefined } }"
+                  v-text="item.name"
+                  class="text-uppercase text-decoration-none font-weight-medium"
+                />
+                <v-spacer/>
+                <goalie-indicator v-if="item.position === 'Goalie'"/>
+              </div>
             </template>
           </v-data-table>
         </v-card-text>
@@ -219,6 +227,7 @@
 
 <script lang="ts">
 import CardTitle from '@/components/CardTitle.vue'
+import GoalieIndicator from '@/components/GoalieIndicator.vue'
 import { getPlayers, Player } from '@/utils/players'
 import { getEvaluationCategories } from '@/utils/evaluations'
 import faker from 'faker'
@@ -252,14 +261,12 @@ interface PlayerDetailSection {
   items: Array<{label: string, field: string}>
 }
 
-@Component({ components: { CardTitle } })
+@Component({ components: { CardTitle, GoalieIndicator } })
 export default class RosterView extends Vue {
   name = 'Roster'
   rosterStatus = 'Approved'
   rosterHeaders: DataTableHeader[] = [
     { text: 'Name', value: 'name' },
-    { text: 'Position', value: 'position' },
-    { text: 'Hand', value: 'hand' },
     { text: 'GP', value: 'gamesPlayed', align: 'end' },
     { text: 'G', value: 'goals', align: 'end' },
     { text: 'A', value: 'assists', align: 'end' },
@@ -297,8 +304,6 @@ export default class RosterView extends Vue {
   historyHeaders: DataTableHeader[] = [
     { text: 'Season', value: 'season' },
     { text: 'Team', value: 'team' },
-    { text: 'Position', value: 'position' },
-    { text: 'Hand', value: 'hand' },
     { text: 'Rank', value: 'rank', align: 'end' },
     { text: 'Rating', value: 'rating', align: 'end' },
     { text: 'GP', value: 'gamesPlayed', align: 'end' },
@@ -492,7 +497,7 @@ export default class RosterView extends Vue {
     }
 
     .roster-table {
-      max-height: calc(100% - 30px);
+      max-height: calc(100% - 8px);
     }
   }
 

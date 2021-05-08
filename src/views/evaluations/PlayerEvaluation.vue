@@ -20,7 +20,11 @@
             class="roster-table d-flex flex-column flex-grow-1"
           >
             <template v-slot:[`item.name`]="{ item }">
-              <router-link :to="{ query: { ...$route.query, player: item.id } }" v-text="item.name" class="text-uppercase text-decoration-none font-weight-medium"/>
+              <div class="d-flex align-center">
+                <router-link :to="{ query: { ...$route.query, player: item.id } }" v-text="item.name" class="text-uppercase text-decoration-none font-weight-medium"/>
+                <v-spacer/>
+                <goalie-indicator v-if="item.stats[0].position === 'Goalie'"/>
+              </div>
             </template>
             <template v-slot:[`item.stats[1].evaluation.total`]="{ value }">
               <div v-if="value !== undefined">{{ value }}</div>
@@ -206,6 +210,7 @@
 
 <script lang="ts">
 import CardTitle from '@/components/CardTitle.vue'
+import GoalieIndicator from '@/components/GoalieIndicator.vue'
 import { Evaluation, getEvaluationCategories } from '@/utils/evaluations'
 import { League } from '@/utils/leagues'
 import { getPlayers, Player } from '@/utils/players'
@@ -217,7 +222,7 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { DataTableHeader } from 'vuetify'
 
-@Component({ components: { CardTitle } })
+@Component({ components: { CardTitle, GoalieIndicator } })
 export default class PlayerEvaluation extends Vue {
   name = 'PlayerEvaluation'
   players: Player[] = this.getPlayers()
