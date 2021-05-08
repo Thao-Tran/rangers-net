@@ -1,6 +1,6 @@
 <template>
   <div class="player-evaluation d-flex flex-grow-1 pa-2">
-    <div v-if="teamName !== undefined" class="player-evaluation-content d-flex flex-column flex-grow-1">
+    <div v-if="teamName !== undefined" class="player-evaluation-content d-flex flex-column align-center flex-grow-1">
       <v-card outlined class="team-card d-flex flex-column flex-grow-1">
         <card-title :title="teamName"/>
         <v-card-subtitle class="mt-0 subtitle-1 grey--text text--darken-4">
@@ -300,9 +300,18 @@ export default class PlayerEvaluation extends Vue {
     return this.playerPrevEvaluation?.total ?? 'N/A'
   }
 
+  created () {
+    this.$store.commit('getLeagues')
+  }
+
   beforeDestroy () {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { player, ...query } = this.$route.query
+
+    if (_.isNil(player)) {
+      return
+    }
+
     this.$router.replace({ query })
   }
 
@@ -349,6 +358,8 @@ export default class PlayerEvaluation extends Vue {
   overflow: hidden;
 
   .v-card {
+    max-width: 1080px;
+    width: 100%;
     overflow: hidden;
 
     .v-card__text {

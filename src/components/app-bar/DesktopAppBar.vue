@@ -21,42 +21,11 @@
       </v-app-bar-title>
     </div>
 
-    <v-tabs slider-color="secondary" slider-size="4" right v-model="activeTab">
-      <v-tab v-for="(item, index) in items" :key="index" v-bind:class="item.class" v-bind:to="item.route">
-        <v-menu v-if="item.items !== undefined" offset-y open-on-hover>
-          <template v-slot:activator="{ on, attrs }">
-            <span plain v-bind="attrs" v-on="on" class="menu">
-              {{ item.title }}
-              <v-icon>mdi-chevron-down</v-icon>
-            </span>
-          </template>
-          <v-list class="menu-item-group" v-model="activeMenuItem[index]">
-            <v-list-item v-for="menuItem in item.items" :key="menuItem.title" v-on:click="activeTab = index" v-bind:to="menuItem.route">
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ menuItem.title }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-        <span v-else>{{ item.title }}</span>
-      </v-tab>
-    </v-tabs>
+    <app-bar-tabs :right="true" :items="items" v-model="activeTab"/>
   </v-app-bar>
 </template>
 
 <style lang="scss" scoped>
-.menu {
-  display: flex;
-  height: 100%;
-  align-items: center;
-
-  &-item-group {
-    background: white;
-  }
-}
-
 .app-bar-title-link {
   color: white;
   text-decoration: none;
@@ -64,6 +33,7 @@
 </style>
 
 <script lang="ts">
+import AppBarTabs from '@/components/app-bar/Tabs.vue'
 import Vue from 'vue'
 import Component from 'vue-class-component'
 
@@ -74,9 +44,9 @@ export interface AppBarItem {
   items?: AppBarItem[]
 }
 
-@Component
+@Component({ components: { AppBarTabs } })
 export default class AppBar extends Vue {
-  name = 'AppBar'
+  name = 'DesktopAppBar'
   activeTab = 0
   selectedMenuItems: Record<string, number> = {}
   items: AppBarItem[] = [
@@ -109,11 +79,5 @@ export default class AppBar extends Vue {
       title: 'System'
     }
   ]
-
-  get activeMenuItem (): Record<string, number> {
-    return {
-      [`${this.activeTab}`]: this.selectedMenuItems[`${this.activeTab}`]
-    }
-  }
 }
 </script>

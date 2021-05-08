@@ -1,5 +1,6 @@
 <template>
   <v-card-title>
+    <slot name="prepend"/>
     <div class="primary--text">
       {{ title }}
       <div class="secondary card-title-underline"></div>

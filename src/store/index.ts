@@ -10,6 +10,10 @@ export default new Vuex.Store<{ leagues: League[] }>({
   },
   mutations: {
     getLeagues (state) {
+      if (state.leagues.length > 0) {
+        return
+      }
+
       state.leagues = getLeagues()
     }
   },

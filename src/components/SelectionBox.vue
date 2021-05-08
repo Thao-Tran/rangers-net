@@ -86,10 +86,6 @@ export default class SelectionBox extends Vue {
       return { value, text }
     })
   }
-
-  created (): void {
-    this.$store.commit('getLeagues')
-  }
 }
 </script>
 
