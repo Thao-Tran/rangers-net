@@ -170,7 +170,7 @@ import { DataTableHeader } from 'vuetify'
 
 @Component({ components: { CardTitle } })
 export default class PlayerEvaluationPlayerCard extends Vue {
-  name = 'RosterPlayerCard'
+  name = 'DesktopPlayerCard'
 
   @Prop({ type: Object, required: false }) player?: Player
 

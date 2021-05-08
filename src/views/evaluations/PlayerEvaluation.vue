@@ -59,9 +59,14 @@
                     <goalie-indicator v-if="player.stats[0].position === 'Goalie'"/>
                   </v-list-item-title>
                   <v-list-item-subtitle class="d-flex align-center">
-                    <div>{{ getProperty(player, 'stats[1].evaluation.total', 'N/A') }}</div>
-                    <v-icon class="ml-1">mdi-arrow-right</v-icon>
-                    <div class="ml-1">{{ getProperty(player, 'stats[0].evaluation.total', '0.0') }}</div>
+                    <div>
+                      <span class="font-weight-medium mr-1">Current:</span>
+                      {{ getProperty(player, 'stats[0].evaluation.total', '0.0') }}
+                    </div>
+                    <div class="ml-4">
+                      <span class="font-weight-medium mr-1">Previous:</span>
+                      {{ getProperty(player, 'stats[1].evaluation.total', 'N/A') }}
+                    </div>
                   </v-list-item-subtitle>
                 </v-list-item-content>
                 <v-icon v-if="getProperty(player, 'stats[0].evaluation.completed', false)" class="green--text">mdi-check</v-icon>
@@ -80,6 +85,9 @@
     <div v-else class="default-text d-flex flex-grow-1 align-center justify-center">
       No team selected
     </div>
+    <v-dialog v-if="$vuetify.breakpoint.mobile" :value="player" fullscreen>
+      <mobile-player-card :player="player" @change="onEvaluationUpdate"/>
+    </v-dialog>
   </div>
 </template>
 
@@ -87,6 +95,7 @@
 import CardTitle from '@/components/CardTitle.vue'
 import GoalieIndicator from '@/components/GoalieIndicator.vue'
 import DesktopPlayerCard from '@/components/player-evaluation/player-card/Desktop.vue'
+import MobilePlayerCard from '@/components/player-evaluation/player-card/Mobile.vue'
 import { Evaluation, getEvaluationCategories } from '@/utils/evaluations'
 import { League } from '@/utils/leagues'
 import { getPlayers, Player } from '@/utils/players'
@@ -98,7 +107,7 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { DataTableHeader } from 'vuetify'
 
-@Component({ components: { CardTitle, GoalieIndicator, DesktopPlayerCard } })
+@Component({ components: { CardTitle, GoalieIndicator, DesktopPlayerCard, MobilePlayerCard } })
 export default class PlayerEvaluation extends Vue {
   name = 'PlayerEvaluation'
 
