@@ -341,7 +341,7 @@ export default class RosterView extends Vue {
     items: getEvaluationCategories()
   }
 
-  players: Player[] = this.getPlayers()
+  players: Player[] = []
   historyTab: number | null = null
 
   downloadDialogTab: number | null = null
@@ -418,12 +418,16 @@ export default class RosterView extends Vue {
       }
 
       return seasonB > seasonA ? 1 : -1
-    }).filter((_, i) => i === 0) ?? []
+    }).slice(1, 2) ?? []
     return latestHistory
   }
 
   get player (): Player | undefined {
     return this.selectedPlayers.length > 0 ? this.selectedPlayers[0] : undefined
+  }
+
+  mounted () {
+    this.players = this.getPlayers()
   }
 
   beforeDestroy () {
