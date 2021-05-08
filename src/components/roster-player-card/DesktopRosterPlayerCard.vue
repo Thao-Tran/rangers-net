@@ -70,16 +70,24 @@
         </v-tabs-items>
       </div>
       <v-divider class="mt-6 mb-4"/>
-      <div class="text-h6 mb-2">
-        <span v-if="selectedHistory.length > 0">{{ selectedHistory[0].season }} </span>
-        Evaluation
-      </div>
-      <div v-if="selectedHistory.length > 0" class="d-flex flex-grow-1 flex-column">
-        <div class="mb-2">
-          <span class="font-weight-bold">Total score:</span>
+      <div class="text-h6 mb-2 d-flex">
+        <span v-if="selectedHistory.length > 0">{{ selectedHistory[0].season }} Evaluation</span>
+        <v-spacer/>
+        <div class="mb-2 text-subtitle-1">
+          <span class="font-weight-medium">Total score:</span>
           {{ selectedHistory[0].evaluation.total }}
         </div>
+      </div>
+      <div v-if="selectedHistory.length > 0" class="d-flex flex-grow-1 flex-column">
         <div class="evaluation">
+          <div class="d-flex">
+            <div class="font-weight-medium mr-2">Position</div>
+            <div>{{ selectedHistory[0].position }}</div>
+          </div>
+          <div class="d-flex">
+            <div class="font-weight-medium mr-2">Hand</div>
+            <div>{{ selectedHistory[0].hand }}</div>
+          </div>
           <div v-for="(item, i) in evaluationDetailSection.items" :key="i" class="d-flex">
             <div class="font-weight-medium mr-2">{{ item.label }}</div>
             <div>{{ selectedHistory[0].evaluation[item.field] }}</div>
@@ -232,7 +240,7 @@ export default class RosterPlayerCard extends Vue {
 
   .evaluation {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     column-gap: 16px;
   }
 
