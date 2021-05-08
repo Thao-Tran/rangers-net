@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="desktop-player-card d-flex flex-column flex-grow-1 mt-2">
+  <v-card outlined class="desktop-evaluation-player-card d-flex flex-column flex-grow-1 mt-2">
     <card-title :title="player.name">
       <v-btn icon color="primary" class="ml-2" @click="unsavedChanges = false" title="Save">
         <v-icon>mdi-content-save</v-icon>
@@ -219,7 +219,7 @@ export default class PlayerEvaluationPlayerCard extends Vue {
 </script>
 
 <style lang="scss">
-.desktop-player-card {
+.desktop-evaluation-player-card {
   height: 100%;
   max-height: 100%;
 

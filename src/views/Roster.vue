@@ -1,6 +1,6 @@
 <template>
   <v-container class="roster" :class="{ mobile: $vuetify.breakpoint.mobile, 'd-flex': !$vuetify.breakpoint.mobile }">
-    <div v-if="this.teamName !== undefined" class="roster-content d-flex flex-column align-center">
+    <div v-if="this.teamName !== undefined" class="roster-content d-flex align-center" :class="{ 'flex-column': $vuetify.breakpoint.mdAndDown }">
       <v-card v-if="this.teamName !== undefined" outlined class="roster-card d-flex flex-column flex-grow-1">
         <card-title :title="teamName">
           <mobile-roster-download-dialog v-if="$vuetify.breakpoint.mobile"/>
@@ -208,6 +208,9 @@ export default class RosterView extends Vue {
 
 <style lang="scss">
 .roster {
+  max-width: 100%;
+  overflow: hidden;
+
   &-content {
     width: 100%;
 
@@ -251,14 +254,10 @@ export default class RosterView extends Vue {
   &:not(.mobile) {
     padding: 8px;
 
-    .v-card {
-      max-width: 1080px;
-      width: 100%;
-    }
-
     .roster-card {
       overflow: hidden;
       height: 100%;
+      width: 100%;
 
       .v-card__text {
         overflow: hidden;

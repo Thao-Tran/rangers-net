@@ -1,23 +1,42 @@
 <template>
-  <v-card outlined class="desktop-player-card d-flex flex-column flex-grow-1 mt-2">
+  <v-card outlined class="desktop-player-card d-flex flex-column flex-grow-1 ml-2">
     <card-title :title="player.name">
       <div class="text-h6 font-weight-regular ml-2" title="HCiD">(<a>{{ player.hcid }}</a>)</div>
     </card-title>
     <v-card-text class="grey--text text--darken-4 d-flex flex-column">
-      <div class="text-h6 mb-2">Contact info</div>
-      <div class="desktop-player-card-content">
-        <div v-for="(section, i) in contactDetailSections" :key="i" class="info-section d-flex">
-          <div class="info-section-content">
-            <div v-for="(item, itemIndex) in section.items" :key="itemIndex" class="info-section-item mb-3">
-              <div class="font-weight-medium">{{ item.label }}</div>
-              <div class="text-break">{{ getPlayerField(item.field) }}</div>
+      <div>
+        <v-tabs v-model="contactTab" height="32px">
+          <v-tab key="contact">Contact</v-tab>
+          <v-tab key="parents">Parents</v-tab>
+        </v-tabs>
+      </div>
+      <v-tabs-items v-model="contactTab" class="mt-4">
+        <v-tab-item key="contact">
+          <div class="info-section d-flex">
+            <div class="info-section-content">
+              <div v-for="(item, itemIndex) in contactDetailSections[0].items" :key="itemIndex" class="info-section-item mb-1">
+                <div class="font-weight-medium">{{ item.label }}</div>
+                <div class="text-break">{{ getPlayerField(item.field) }}</div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <v-divider class="my-4"/>
+        </v-tab-item>
+        <v-tab-item key="parents">
+          <div class="desktop-player-card-content">
+            <div v-for="(section, i) in contactDetailSections.slice(1)" :key="i" class="info-section d-flex">
+              <div class="info-section-content">
+                <div v-for="(item, itemIndex) in section.items" :key="itemIndex" class="info-section-item mb-1">
+                  <div class="font-weight-medium">{{ item.label }}</div>
+                  <div class="text-break">{{ getPlayerField(item.field) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </v-tab-item>
+      </v-tabs-items>
+      <v-divider class="mt-4"/>
       <div>
-        <v-tabs v-model="historyTab">
+        <v-tabs v-model="historyTab" height="32px">
           <v-tab key="history">History</v-tab>
           <v-tab key="suspensions">
             <div class="d-flex align-center">
@@ -33,7 +52,7 @@
         </v-tabs>
       </div>
       <div class="history-tables d-flex flex-grow-1 flex-column">
-        <v-tabs-items v-model="historyTab">
+        <v-tabs-items v-model="historyTab" class="d-flex">
           <v-tab-item key="history">
             <v-data-table
               :headers="historyHeaders"
@@ -78,7 +97,7 @@
           {{ selectedHistory[0].evaluation.total }}
         </div>
       </div>
-      <div v-if="selectedHistory.length > 0" class="d-flex flex-grow-1 flex-column">
+      <div v-if="selectedHistory.length > 0" class="evaluation-content d-flex flex-grow-1 flex-column">
         <div class="evaluation">
           <div class="d-flex">
             <div class="font-weight-medium mr-2">Position</div>
@@ -94,7 +113,7 @@
           </div>
         </div>
         <div class="text-subtitle-1 font-weight-medium mt-3 mb-1">Coach's comments</div>
-        <div>{{ selectedHistory[0].evaluation.comments }}</div>
+        <div class="comments">{{ selectedHistory[0].evaluation.comments }}</div>
       </div>
       <div v-else class="evaluation-default-text d-flex flex-grow-1 align-center justify-center">
         No previous evaluations
@@ -124,6 +143,7 @@ export default class RosterPlayerCard extends Vue {
 
   @Prop({ type: Object, required: false }) player?: Player
 
+  contactTab = 0
   historyTab: number | null = null
 
   contactDetailSections: PlayerDetailSection[] = [
@@ -214,27 +234,40 @@ export default class RosterPlayerCard extends Vue {
 
 <style lang="scss">
 .desktop-player-card {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+
   .v-card__text {
     height: 100%;
+    max-height: 100%;
+    overflow: hidden;
   }
 
   &-content {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     column-gap: 16px;
+  }
 
-    .info-section {
+  .info-section {
+    &-content {
+      width: 100%;
+    }
 
-      &-content {
-        width: 100%;
-      }
+    &-item {
+      display: grid;
+      grid-template-columns: 86px auto;
+      column-gap: 8px;
+      width: 100%;
+    }
+  }
 
-      &-item {
-        display: grid;
-        grid-template-columns: 86px auto;
-        column-gap: 8px;
-        width: 100%;
-      }
+  .evaluation-content {
+    overflow: hidden;
+
+    .comments {
+      overflow-y: auto;
     }
   }
 
@@ -245,8 +278,21 @@ export default class RosterPlayerCard extends Vue {
   }
 
   .history-tables {
+    max-height: 138px;
+    overflow: hidden;
+
+    .v-window__container {
+      display: flex;
+      overflow: hidden;
+
+      .v-window-item {
+        display: flex;
+        overflow: hidden;
+      }
+    }
+
     .v-data-table__wrapper {
-      max-height: 194px;
+      max-height: 100%;
     }
   }
 }
