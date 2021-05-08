@@ -1,11 +1,14 @@
 <template>
-  <v-list-group v-if="item.items && item.items.length > 0">
+  <v-list-group v-if="item.items && item.items.length > 0" :sub-group="subGroup">
     <template v-slot:activator>
-      <v-list-item-content>
-        <v-list-item-title v-text="item.label"/>
-      </v-list-item-content>
+      <v-list-item-title v-text="item.label"/>
     </template>
-    <navigation-item v-for="(subItem, subItemIndex) in item.items" :key="subItemIndex" :item="subItem"/>
+    <navigation-item
+      v-for="(subItem, subItemIndex) in item.items"
+      :key="subItemIndex"
+      :item="subItem"
+      :subGroup="true"
+    />
   </v-list-group>
   <v-list v-else>
     <v-list-item :to="item.route ? { path: item.route, query: $route.query } : undefined">
@@ -30,6 +33,7 @@ export default class NavigationItem extends Vue {
   name = 'NavigationItem'
 
   @Prop(Object) item!: NavItem
+  @Prop({ type: Boolean, default: false }) subGroup?: boolean
 }
 </script>
 
