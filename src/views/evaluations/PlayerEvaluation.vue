@@ -1,13 +1,16 @@
 <template>
-  <div class="player-evaluation d-flex flex-grow-1 pa-2">
+  <div class="player-evaluation flex-grow-1 pa-2" :class="{ mobile: $vuetify.breakpoint.mobile, 'd-flex': !$vuetify.breakpoint.mobile }">
     <div v-if="teamName !== undefined" class="player-evaluation-content d-flex flex-column align-center flex-grow-1">
       <v-card outlined class="team-card d-flex flex-column flex-grow-1">
-        <card-title :title="teamName"/>
-        <v-card-subtitle class="mt-0 subtitle-1 grey--text text--darken-4">
-          <span class="font-weight-medium">Team average:</span> {{ teamAverage }}
-        </v-card-subtitle>
+        <card-title :title="teamName">
+          <v-spacer/>
+          <div class="subtitle-1 grey--text text--darken-4">
+            <span class="font-weight-medium">Team average:</span> {{ teamAverage }}
+          </div>
+        </card-title>
         <v-card-text>
           <v-data-table
+            v-if="!$vuetify.breakpoint.mobile"
             :headers="headers"
             :items="players"
             :items-per-page=-1
@@ -43,164 +46,36 @@
               <div v-else class="red--text font-weight-bold">X</div>
             </template>
           </v-data-table>
-        </v-card-text>
-      </v-card>
-      <v-card v-if="player !== undefined" outlined class="player-card d-flex flex-column flex-grow-1 mt-2">
-        <card-title :title="player.name">
-          <v-btn icon color="primary" class="ml-2" @click="unsavedChanges = false" title="Save">
-            <v-icon>mdi-content-save</v-icon>
-          </v-btn>
-          <v-tooltip v-if="unsavedChanges" bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-icon v-on="on" v-bind="attrs" color="yellow darken-2">mdi-alert</v-icon>
-            </template>
-            <div class="unsaved-changes-tooltip">
-              Click Save button to store changes. Any fields left blank will be rated as a zero and comments are mandatory.
-            </div>
-          </v-tooltip>
-        </card-title>
-        <v-card-text class="d-flex grey--text text--darken-4 flex-grow-1">
-          <div class="current-stats d-flex flex-column flex-grow-1">
-            <div class="text-h6 mb-4 d-flex">
-              Current
-              <v-spacer/>
-              <div class="subtitle-1 align-center">
-                <span class="font-weight-medium mr-1">Total score:</span>
-                {{ playerCurrentTotal }}
-              </div>
-            </div>
-            <div class="stats d-flex justify-space-around">
-              <div v-for="{ text, value } in stats" :key="value" class="d-flex flex-column align-center mr-8">
-                <div class="font-weight-bold">{{ text }}</div>
-                {{ getProperty(player, value) }}
-              </div>
-            </div>
-            <div class="evaluation mt-4">
-              <v-autocomplete
-                v-model="player.stats[0].position"
-                :items="positionValues"
-                label="Position"
-                :title="player.stats[0].position || 'Position'"
-                dense
-                outlined
-                hideDetails
-                clearable
-                class="text-no-wrap"
-              />
-              <v-autocomplete
-                v-model="player.stats[0].hand"
-                :items="handValues"
-                label="Hand"
-                :title="player.stats[0].position || 'Hand'"
-                dense
-                outlined
-                hideDetails
-                clearable
-                class="text-no-wrap"
-              />
-              <v-autocomplete
-                v-for="{ label, field, help } in evaluationCategories"
-                :value="playerCurrentEvaluation[field]"
-                :items="evaluationValues"
-                :key="field"
-                :label="label"
-                :title="playerCurrentEvaluation[field] || label"
-                @change="onEvaluationUpdate($event, field)"
-                dense
-                outlined
-                hideDetails
-                clearable
-                class="text-no-wrap"
+          <v-list v-else class="d-flex flex-column flex-grow-1">
+            <v-list-item-group :value="selectedPlayers">
+              <v-list-item
+                v-for="player in players"
+                :key="player.id"
+                @click="$router.push({ query: { ...$route.query, player: player.id, season: undefined } })"
               >
-                <template v-slot:append>
-                  <v-tooltip right>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-icon v-on="on" v-bind="attrs">mdi-help-circle-outline</v-icon>
-                    </template>
-                    {{ help }}
-                  </v-tooltip>
-                </template>
-              </v-autocomplete>
-            </div>
-            <v-textarea
-              v-model="playerCurrentEvaluation.comments"
-              label="Coach's comments"
-              class="comments d-flex flex-column flex-grow-1 mt-4"
-              @change="onEvaluationUpdate($event, 'comments')"
-              no-resize
-              hideDetails
-              clearable
-            />
-          </div>
-          <v-divider vertical class="mx-4"/>
-          <div class="prev-stats d-flex flex-column flex-grow-1">
-            <div class="text-h6 mb-4 d-flex align-center">
-              Last year
-              <v-spacer/>
-              <div class="subtitle-1 align-center">
-                <span class="font-weight-medium mr-1">Total score:</span>
-                {{ playerPrevTotal }}
-              </div>
-            </div>
-            <div v-if="playerPrevEvaluation" class="prev-stats d-flex flex-column">
-              <div class="stats d-flex justify-space-around">
-                <div v-for="{ text, value } in stats" :key="value" class="d-flex flex-column align-center mr-8">
-                  <div class="font-weight-bold">{{ text }}</div>
-                  {{ getProperty(player, value) }}
-                </div>
-              </div>
-              <div class="evaluation mt-4">
-                <v-autocomplete
-                  v-model="player.stats[1].position"
-                  :items="positionValues"
-                  label="Position"
-                  :title="player.stats[1].position || 'Position'"
-                  dense
-                  outlined
-                  hideDetails
-                  readonly
-                  class="text-no-wrap"
-                />
-                <v-autocomplete
-                  v-model="player.stats[1].hand"
-                  :items="handValues"
-                  label="Hand"
-                  :title="player.stats[1].position || 'Hand'"
-                  dense
-                  outlined
-                  hideDetails
-                  readonly
-                  class="text-no-wrap"
-                />
-                <v-autocomplete
-                  v-for="{ label, field } in evaluationCategories"
-                  :value="playerPrevEvaluation[field]"
-                  :items="evaluationValues"
-                  :key="field"
-                  :label="label"
-                  :title="playerPrevEvaluation[field] || label"
-                  readonly
-                  dense
-                  outlined
-                  hideDetails
-                  class="text-no-wrap"
-                />
-              </div>
-              <v-textarea
-                v-model="playerPrevEvaluation.comments"
-                label="Coach's comments"
-                class="comments d-flex flex-column flex-grow-1 mt-4"
-                no-resize
-                hideDetails
-                readonly
-              />
-            </div>
-            <div v-else class="d-flex flex-grow-1 align-center justify-center">
-              No previous evaluation
-            </div>
-          </div>
+                <v-list-item-content>
+                  <v-list-item-title class="d-flex align-center">
+                    <span class="mr-2">{{ player.name }}</span>
+                    <goalie-indicator v-if="player.stats[0].position === 'Goalie'"/>
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="d-flex align-center">
+                    <div>{{ getProperty(player, 'stats[1].evaluation.total', 'N/A') }}</div>
+                    <v-icon class="ml-1">mdi-arrow-right</v-icon>
+                    <div class="ml-1">{{ getProperty(player, 'stats[0].evaluation.total', '0.0') }}</div>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+                <v-icon v-if="getProperty(player, 'stats[0].evaluation.completed', false)" class="green--text">mdi-check</v-icon>
+                <div v-else class="red--text font-weight-bold px-2">X</div>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
         </v-card-text>
       </v-card>
+      <desktop-player-card
+        v-if="player !== undefined && !$vuetify.breakpoint.mobile"
+        :player="player"
+        @change="onEvaluationUpdate"
+      />
     </div>
     <div v-else class="default-text d-flex flex-grow-1 align-center justify-center">
       No team selected
@@ -211,6 +86,7 @@
 <script lang="ts">
 import CardTitle from '@/components/CardTitle.vue'
 import GoalieIndicator from '@/components/GoalieIndicator.vue'
+import DesktopPlayerCard from '@/components/player-evaluation/player-card/Desktop.vue'
 import { Evaluation, getEvaluationCategories } from '@/utils/evaluations'
 import { League } from '@/utils/leagues'
 import { getPlayers, Player } from '@/utils/players'
@@ -222,10 +98,12 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { DataTableHeader } from 'vuetify'
 
-@Component({ components: { CardTitle, GoalieIndicator } })
+@Component({ components: { CardTitle, GoalieIndicator, DesktopPlayerCard } })
 export default class PlayerEvaluation extends Vue {
   name = 'PlayerEvaluation'
+
   players: Player[] = this.getPlayers()
+  evaluationCategories = getEvaluationCategories()
 
   headers: DataTableHeader[] = [
     { text: 'Name', value: 'name' },
@@ -233,23 +111,6 @@ export default class PlayerEvaluation extends Vue {
     { text: 'Current', value: 'stats[0].evaluation.total', align: 'end' },
     { text: 'Completed', value: 'stats[0].evaluation.completed', align: 'center' }
   ]
-
-  stats: DataTableHeader[] = [
-    { text: 'GP', value: 'stats[0].gamesPlayed' },
-    { text: 'G', value: 'stats[0].goals' },
-    { text: 'A', value: 'stats[0].assists' },
-    { text: 'P', value: 'stats[0].points' },
-    { text: 'PM', value: 'stats[0].penaltyMinutes' }
-  ]
-
-  evaluationCategories = getEvaluationCategories()
-  evaluationValues = _.range(1, 10.5, 0.5).map(val => val.toFixed(1))
-
-  positionValues = Object.values(Position)
-
-  handValues = ['L', 'R']
-
-  unsavedChanges = false
 
   get team (): Team | undefined {
     const league = (this.$store.state.leagues as League[]).find(({ id }) => id === this.$route.query.league)
@@ -332,7 +193,7 @@ export default class PlayerEvaluation extends Vue {
     return _.get(data, property, defaultValue)
   }
 
-  onEvaluationUpdate (value: string, field: string): void {
+  onEvaluationUpdate ({ value, field }: { value: string, field: string }): void {
     if (this.playerCurrentEvaluation === undefined) {
       return
     }
@@ -347,8 +208,6 @@ export default class PlayerEvaluation extends Vue {
 
     Vue.set(this.playerCurrentEvaluation, 'total', total.toFixed(1))
     Vue.set(this.playerCurrentEvaluation, 'completed', completed && !_.isEmpty(this.playerCurrentEvaluation.comments))
-
-    this.unsavedChanges = true
   }
 }
 </script>
@@ -381,57 +240,18 @@ export default class PlayerEvaluation extends Vue {
     }
   }
 
-  .player-card {
-    height: 100%;
-    max-height: 100%;
+  &.mobile {
+    overflow: visible;
+    height: auto;
+    padding: 0;
 
-    .evaluation {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
+    .v-card__text {
+      overflow: visible;
+      height: auto;
     }
 
-    .comments {
-      overflow: hidden;
-      max-height: calc(100% - 28px);
-
-      .v-input {
-        &__control {
-          max-height: 100%;
-          height: 100%;
-        }
-
-        &__slot {
-          max-height: 100%;
-          height: 100%;
-
-          .v-text-field__slot {
-            max-height: 100%;
-            height: 100%;
-
-            textarea {
-              height: 100%;
-            }
-          }
-        }
-      }
-    }
-
-    .current-stats {
-      width: 100%;
-      overflow: hidden;
-    }
-
-    .prev-stats {
-      width: 100%;
-      overflow: hidden;
-
-      .evaluation-value {
-        display: grid;
-        grid-template-columns: 3fr 1fr;
-        gap: 8px;
-      }
+    .team-card {
+      margin: 8px;
     }
   }
 }
