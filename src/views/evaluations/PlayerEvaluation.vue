@@ -1,6 +1,6 @@
 <template>
   <div class="player-evaluation flex-grow-1 pa-2" :class="{ mobile: $vuetify.breakpoint.mobile, 'd-flex': !$vuetify.breakpoint.mobile }">
-    <div v-if="teamName !== undefined" class="player-evaluation-content d-flex flex-column align-center flex-grow-1">
+    <div v-if="teamName !== undefined" class="player-evaluation-content d-flex align-center flex-grow-1" :class="{ 'flex-column': $vuetify.breakpoint.mdAndDown }">
       <v-card outlined class="team-card d-flex flex-column flex-grow-1">
         <card-title :title="teamName">
           <v-spacer/>
@@ -226,7 +226,7 @@ export default class PlayerEvaluation extends Vue {
   overflow: hidden;
 
   .v-card {
-    max-width: 1080px;
+    height: 100%;
     width: 100%;
     overflow: hidden;
 

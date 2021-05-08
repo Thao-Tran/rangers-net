@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined class="desktop-evaluation-player-card d-flex flex-column flex-grow-1 mt-2">
+  <v-card outlined class="desktop-evaluation-player-card d-flex flex-column flex-grow-1 ml-2">
     <card-title :title="player.name">
       <v-btn icon color="primary" class="ml-2" @click="unsavedChanges = false" title="Save">
         <v-icon>mdi-content-save</v-icon>
@@ -13,146 +13,149 @@
         </div>
       </v-tooltip>
     </card-title>
-    <v-card-text class="d-flex grey--text text--darken-4 flex-grow-1">
-      <div class="current-stats d-flex flex-column flex-grow-1">
-        <div class="text-h6 mb-4 d-flex">
-          Current
-          <v-spacer/>
-          <div class="subtitle-1 align-center">
-            <span class="font-weight-medium mr-1">Total score:</span>
-            {{ playerCurrentTotal }}
-          </div>
-        </div>
-        <div class="stats d-flex justify-space-around">
-          <div v-for="{ text, value } in stats" :key="value" class="d-flex flex-column align-center mr-8">
-            <div class="font-weight-bold">{{ text }}</div>
-            {{ getProperty(player, value) }}
-          </div>
-        </div>
-        <div class="evaluation mt-4">
-          <v-autocomplete
-            v-model="player.stats[0].position"
-            :items="positionValues"
-            label="Position"
-            :title="player.stats[0].position || 'Position'"
-            dense
-            outlined
-            hideDetails
-            clearable
-            class="text-no-wrap"
-          />
-          <v-autocomplete
-            v-model="player.stats[0].hand"
-            :items="handValues"
-            label="Hand"
-            :title="player.stats[0].position || 'Hand'"
-            dense
-            outlined
-            hideDetails
-            clearable
-            class="text-no-wrap"
-          />
-          <v-autocomplete
-            v-for="{ label, field, help } in evaluationCategories"
-            :value="playerCurrentEvaluation[field]"
-            :items="evaluationValues"
-            :key="field"
-            :label="label"
-            :title="playerCurrentEvaluation[field] || label"
-            @change="onEvaluationUpdate($event, field)"
-            dense
-            outlined
-            hideDetails
-            clearable
-            class="text-no-wrap"
-          >
-            <template v-slot:append>
-              <v-tooltip right>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon v-on="on" v-bind="attrs">mdi-help-circle-outline</v-icon>
-                </template>
-                {{ help }}
-              </v-tooltip>
-            </template>
-          </v-autocomplete>
-        </div>
-        <v-textarea
-          v-model="playerCurrentEvaluation.comments"
-          label="Coach's comments"
-          class="comments d-flex flex-column flex-grow-1 mt-4"
-          @change="onEvaluationUpdate($event, 'comments')"
-          no-resize
-          hideDetails
-          clearable
-        />
+    <v-card-text class="d-flex flex-column grey--text text--darken-4 flex-grow-1">
+      <div>
+        <v-tabs v-model="tab" height="32px">
+          <v-tab key="current">Current</v-tab>
+          <v-tab key="previous">Previous</v-tab>
+        </v-tabs>
       </div>
-      <v-divider vertical class="mx-4"/>
-      <div class="prev-stats d-flex flex-column flex-grow-1">
-        <div class="text-h6 mb-4 d-flex align-center">
-          Last year
-          <v-spacer/>
-          <div class="subtitle-1 align-center">
-            <span class="font-weight-medium mr-1">Total score:</span>
-            {{ playerPrevTotal }}
+      <v-tabs-items v-model="tab" class="mt-4">
+        <v-tab-item key="current">
+          <div class="current-stats d-flex flex-column flex-grow-1">
+            <div class="text-subtitle-1 mb-4 d-flex align-center">
+              <span class="font-weight-medium mr-1">Total score:</span>
+              {{ playerCurrentTotal }}
+            </div>
+            <div class="stats d-flex justify-space-around">
+              <div v-for="{ text, value } in stats" :key="value" class="d-flex flex-column align-center mr-8">
+                <div class="font-weight-bold">{{ text }}</div>
+                {{ getProperty(player, value) }}
+              </div>
+            </div>
+            <div class="evaluation mt-4">
+              <v-autocomplete
+                v-model="player.stats[0].position"
+                :items="positionValues"
+                label="Position"
+                :title="player.stats[0].position || 'Position'"
+                dense
+                outlined
+                hideDetails
+                clearable
+                class="text-no-wrap"
+              />
+              <v-autocomplete
+                v-model="player.stats[0].hand"
+                :items="handValues"
+                label="Hand"
+                :title="player.stats[0].position || 'Hand'"
+                dense
+                outlined
+                hideDetails
+                clearable
+                class="text-no-wrap"
+              />
+              <v-autocomplete
+                v-for="{ label, field, help } in evaluationCategories"
+                :value="playerCurrentEvaluation[field]"
+                :items="evaluationValues"
+                :key="field"
+                :label="label"
+                :title="playerCurrentEvaluation[field] || label"
+                @change="onEvaluationUpdate($event, field)"
+                dense
+                outlined
+                hideDetails
+                clearable
+                class="text-no-wrap"
+              >
+                <template v-slot:append>
+                  <v-tooltip right>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon v-on="on" v-bind="attrs">mdi-help-circle-outline</v-icon>
+                    </template>
+                    {{ help }}
+                  </v-tooltip>
+                </template>
+              </v-autocomplete>
+            </div>
+            <v-textarea
+              v-model="playerCurrentEvaluation.comments"
+              label="Coach's comments"
+              class="comments d-flex flex-column flex-grow-1 mt-4"
+              @change="onEvaluationUpdate($event, 'comments')"
+              no-resize
+              hideDetails
+              clearable
+            />
           </div>
-        </div>
-        <div v-if="playerPrevEvaluation" class="prev-stats d-flex flex-column">
-          <div class="stats d-flex justify-space-around">
-            <div v-for="{ text, value } in stats" :key="value" class="d-flex flex-column align-center mr-8">
-              <div class="font-weight-bold">{{ text }}</div>
-              {{ getProperty(player, value) }}
+        </v-tab-item>
+        <v-tab-item key="previous">
+          <div class="prev-stats d-flex flex-column flex-grow-1">
+            <div class="text-subtitle-1 mb-4 d-flex align-center">
+              <span class="font-weight-medium mr-1">Total score:</span>
+              {{ playerPrevTotal }}
+            </div>
+            <div v-if="playerPrevEvaluation" class="prev-stats d-flex flex-column">
+              <div class="stats d-flex justify-space-around">
+                <div v-for="{ text, value } in stats" :key="value" class="d-flex flex-column align-center mr-8">
+                  <div class="font-weight-bold">{{ text }}</div>
+                  {{ getProperty(player, value) }}
+                </div>
+              </div>
+              <div class="evaluation mt-4">
+                <v-autocomplete
+                  v-model="player.stats[1].position"
+                  :items="positionValues"
+                  label="Position"
+                  :title="player.stats[1].position || 'Position'"
+                  dense
+                  outlined
+                  hideDetails
+                  readonly
+                  class="text-no-wrap"
+                />
+                <v-autocomplete
+                  v-model="player.stats[1].hand"
+                  :items="handValues"
+                  label="Hand"
+                  :title="player.stats[1].position || 'Hand'"
+                  dense
+                  outlined
+                  hideDetails
+                  readonly
+                  class="text-no-wrap"
+                />
+                <v-autocomplete
+                  v-for="{ label, field } in evaluationCategories"
+                  :value="playerPrevEvaluation[field]"
+                  :items="evaluationValues"
+                  :key="field"
+                  :label="label"
+                  :title="playerPrevEvaluation[field] || label"
+                  readonly
+                  dense
+                  outlined
+                  hideDetails
+                  class="text-no-wrap"
+                />
+              </div>
+              <v-textarea
+                v-model="playerPrevEvaluation.comments"
+                label="Coach's comments"
+                class="comments d-flex flex-column flex-grow-1 mt-4"
+                no-resize
+                hideDetails
+                readonly
+              />
+            </div>
+            <div v-else class="d-flex flex-grow-1 align-center justify-center">
+              No previous evaluation
             </div>
           </div>
-          <div class="evaluation mt-4">
-            <v-autocomplete
-              v-model="player.stats[1].position"
-              :items="positionValues"
-              label="Position"
-              :title="player.stats[1].position || 'Position'"
-              dense
-              outlined
-              hideDetails
-              readonly
-              class="text-no-wrap"
-            />
-            <v-autocomplete
-              v-model="player.stats[1].hand"
-              :items="handValues"
-              label="Hand"
-              :title="player.stats[1].position || 'Hand'"
-              dense
-              outlined
-              hideDetails
-              readonly
-              class="text-no-wrap"
-            />
-            <v-autocomplete
-              v-for="{ label, field } in evaluationCategories"
-              :value="playerPrevEvaluation[field]"
-              :items="evaluationValues"
-              :key="field"
-              :label="label"
-              :title="playerPrevEvaluation[field] || label"
-              readonly
-              dense
-              outlined
-              hideDetails
-              class="text-no-wrap"
-            />
-          </div>
-          <v-textarea
-            v-model="playerPrevEvaluation.comments"
-            label="Coach's comments"
-            class="comments d-flex flex-column flex-grow-1 mt-4"
-            no-resize
-            hideDetails
-            readonly
-          />
-        </div>
-        <div v-else class="d-flex flex-grow-1 align-center justify-center">
-          No previous evaluation
-        </div>
-      </div>
+        </v-tab-item>
+      </v-tabs-items>
     </v-card-text>
   </v-card>
 </template>
@@ -173,6 +176,8 @@ export default class PlayerEvaluationPlayerCard extends Vue {
   name = 'DesktopPlayerCard'
 
   @Prop({ type: Object, required: false }) player?: Player
+
+  tab = 0
 
   stats: DataTableHeader[] = [
     { text: 'GP', value: 'stats[0].gamesPlayed' },
