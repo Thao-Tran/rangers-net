@@ -50,7 +50,7 @@ export default class NavigationDrawer extends Vue {
   name = 'NavigationDrawer'
 
   @Prop({ type: Boolean, default: true }) isSelectionBoxVisible!: boolean
-  @Prop(Array) selectionBoxFields?: SelectionField[]
+  @Prop({ type: Array, required: false }) selectionBoxFields?: SelectionField[]
   @Prop(String) title?: string
   @Prop(Array) sections?: NavigationSection[]
 }

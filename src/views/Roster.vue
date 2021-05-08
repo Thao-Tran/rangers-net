@@ -421,6 +421,12 @@ export default class RosterView extends Vue {
     return this.selectedPlayers.length > 0 ? this.selectedPlayers[0] : undefined
   }
 
+  beforeDestroy () {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { player, season, ...query } = this.$route.query
+    this.$router.replace({ query })
+  }
+
   getPlayers (): Player[] {
     const players = getPlayers(this.teamName ?? '')
 

@@ -15,7 +15,6 @@ export const ROUTE_PATH = '/general-management'
 @Component({ components: { NavigationDrawer } })
 export default class GeneralManagement extends Vue {
   name = 'GeneralManagement'
-  selectedFilters: Record<string, string> = {}
   sections = [
     {
       items: [
@@ -52,6 +51,12 @@ export default class GeneralManagement extends Vue {
       ]
     }
   ]
+
+  beforeDestroy () {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { league, division, subDivision, team, ...query } = this.$route.query
+    this.$router.replace({ query })
+  }
 }
 </script>
 

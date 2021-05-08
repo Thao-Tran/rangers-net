@@ -295,6 +295,12 @@ export default class PlayerEvaluation extends Vue {
     return this.playerPrevEvaluation?.total ?? 'N/A'
   }
 
+  beforeDestroy () {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { player, ...query } = this.$route.query
+    this.$router.replace({ query })
+  }
+
   getPlayers (): Player[] {
     const players = getPlayers(this.teamName ?? '')
 
